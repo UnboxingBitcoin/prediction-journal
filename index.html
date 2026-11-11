@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Prediction Journal</title>
-<link rel="icon" id="fav" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" id="fav" href="favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" id="tc" content="#cfe8b0">
@@ -193,7 +193,7 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
 <div class="wrap">
   <header class="row between hdr">
     <div class="brand">
-      <img id="brand-logo" src="logo.svg" alt="" width="48" height="48">
+      <img id="brand-logo" src="logo.png" alt="" width="48" height="48">
       <div>
         <h1>Prediction Journal</h1>
         <div class="sub" id="today-label"></div>
@@ -992,9 +992,9 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
     if(t === "pista") document.documentElement.removeAttribute("data-theme");
     else document.documentElement.setAttribute("data-theme", t);
     try{ localStorage.setItem("pj-theme", t); }catch(e){}
-    const bw = t === "mono" || t === "noir", lg = bw ? "logo-" + t + ".svg" : "logo.svg";
+    const bw = t === "mono" || t === "noir", lg = bw ? "logo-" + t + ".png" : "logo.png";
     const L = document.getElementById("brand-logo"); if(L) L.setAttribute("src", lg);
-    const F = document.getElementById("fav"); if(F) F.setAttribute("href", bw ? lg : "favicon.svg");
+    const F = document.getElementById("fav"); if(F) F.setAttribute("href", bw ? lg : "favicon.png");
     const T = document.getElementById("tc"); if(T) T.setAttribute("content", t === "noir" ? "#000000" : t === "mono" ? "#ffffff" : (getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() || "#cfe8b0"));
     document.querySelectorAll(".theme-btn").forEach(b => b.classList.toggle("on", b.dataset.t === t));
   }
