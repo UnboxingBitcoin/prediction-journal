@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Prediction Journal</title>
 <link rel="icon" id="fav" href="favicon.png" type="image/png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" id="tc" content="#cfe8b0">
 <script>try{var _t=localStorage.getItem("pj-theme");if(_t==="noir"||_t==="mono")document.getElementById("tc").setAttribute("content",_t==="noir"?"#000000":"#ffffff")}catch(e){}</script>
@@ -171,9 +171,10 @@ nav svg{width:20px;height:20px}
 ol{padding-left:20px;margin:0;font-size:14px}
 ol li{margin:5px 0}
 .storage{font-size:11px;color:var(--muted);text-align:center;margin-top:24px;font-family:"Space Mono",monospace}
-.brand{display:flex;align-items:center;gap:12px;min-width:0}
-.brand img{width:44px;height:44px;flex:none}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand img{width:66px;height:66px;flex:none;margin:-8px -2px -8px -6px}
 .brand h1{font-size:22px}
+@media (max-width:380px){.brand img{width:56px;height:56px}.brand h1{font-size:18px}}
 .hdr{background:var(--card);border:2.5px solid var(--line);border-radius:18px;padding:14px 14px;box-shadow:var(--shadow);margin-bottom:4px}
 
 .mono{font-family:"Space Mono",monospace;font-size:13px;font-weight:700;word-break:break-all}
