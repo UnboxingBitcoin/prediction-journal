@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prediction Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ===== Retro theme: pista + black & white ===== */
+:root{
+  --bg:#cfe8b0;        /* pista */
+  --bg-dot:#bcdc98;
+  --card:#fffdf5;      /* paper white */
+  --soft:#f3f7e8;
+  --ink:#111111;
+  --muted:#4d5a3f;
+  --line:#111111;
+  --hair:#d9e4c6;
+  --accent:#111111;
+  --on-accent:#ffffff;
+  --good:#1f7a1f;--bad:#c2261c;--warn:#d9480f;
+  --pop:#ffd43b;       /* small highlight */
+  --shadow:4px 4px 0 #111111;
+  --shadow-sm:2px 2px 0 #111111;
+}
+html[data-theme=butter]{--bg:#ffe8a3;--bg-dot:#f9db7c;--soft:#fff6d6;--muted:#6b5a24;--hair:#f0e1ae;--pop:#9ad06b}
+html[data-theme=sky]{--bg:#bfe3ff;--bg-dot:#a6d6fb;--soft:#ebf6ff;--muted:#2f4e6b;--hair:#cfe3f3;--pop:#ffd43b}
+html[data-theme=bubblegum]{--bg:#ffc9e0;--bg-dot:#ffb3d3;--soft:#fff0f6;--muted:#7a3358;--hair:#f6d3e3;--pop:#ffd43b}
+html[data-theme=lilac]{--bg:#d9ccff;--bg-dot:#c9b8ff;--soft:#f3efff;--muted:#4b3d80;--hair:#e1d9fb;--pop:#ffd43b}
+html[data-theme=night]{--bg:#1b2416;--bg-dot:#232f1c;--card:#10160d;--soft:#1f2a19;--ink:#e9f5d8;--muted:#a3b88c;--line:#cfe8b0;--hair:#2c3a23;
+  --accent:#cfe8b0;--on-accent:#111111;--good:#8ce99a;--bad:#ff8787;--warn:#ffa94d;--pop:#cfe8b0;--shadow:4px 4px 0 #cfe8b0;--shadow-sm:2px 2px 0 #cfe8b0}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;color:var(--ink);font:15px/1.5 "Space Grotesk",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{background-color:var(--bg);background-image:radial-gradient(var(--bg-dot) 1.2px,transparent 1.2px);background-size:16px 16px}
+.wrap{max-width:560px;margin:0 auto;padding:24px 16px 120px}
+h1{font-family:"Archivo Black",Impact,sans-serif;font-weight:400;font-size:26px;line-height:1.05;margin:0;letter-spacing:-.01em;text-transform:uppercase}
+h2{font-family:"Space Mono",ui-monospace,monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink);margin:0 0 12px;display:inline-block;background:var(--pop);padding:2px 8px;border:2px solid var(--line);border-radius:6px}
+.sub{color:var(--muted);font-size:13px;font-family:"Space Mono",monospace}
+.section{background:var(--card);border:2.5px solid var(--line);border-radius:18px;padding:18px 16px;margin:16px 0;box-shadow:var(--shadow)}
+.row{display:flex;gap:10px;align-items:center}
+.between{justify-content:space-between}
+.grow{flex:1;min-width:0}
+
+/* Buttons: black primary, white secondary */
+button{font:inherit;cursor:pointer;background:none;color:var(--ink);border:0;padding:0}
+.btn,.link,.acts button,.chip,.icon-btn,.seg button,.theme-btn{transition:transform .06s,box-shadow .06s}
+.btn{background:var(--accent);color:var(--on-accent);border:2.5px solid var(--line);border-radius:14px;padding:13px 18px;font-weight:700;font-size:15px;width:100%;box-shadow:var(--shadow);text-transform:uppercase;letter-spacing:.04em}
+.link{background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:8px 13px;font-size:13px;font-weight:700;box-shadow:var(--shadow-sm)}
+.btn:active,.link:active,.acts button:active,.chip:active,.icon-btn:active,.theme-btn:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--line)}
+.link.dark,#save-review,#add-cat,#do-import,#sh-save{background:var(--accent);color:var(--on-accent)}
+#sh-del{color:var(--bad) !important}
+.icon-btn{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--card);border:2px solid var(--line);box-shadow:var(--shadow-sm)}
+.icon-btn svg{width:19px;height:19px}
+
+input,textarea,select{font:inherit;color:var(--ink);background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:11px 13px;width:100%;outline:none}
+input:focus,textarea:focus,select:focus{box-shadow:var(--shadow-sm)}
+textarea{resize:vertical;min-height:64px}
+select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 12px) 50%;background-size:6px 6px;background-repeat:no-repeat}
+.big-input{background:var(--soft);font-size:19px;font-weight:600;line-height:1.35;min-height:84px}
+.big-input::placeholder{color:var(--muted);opacity:.8}
+label{display:block;font-family:"Space Mono",monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink);margin:16px 0 7px}
+
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{background:var(--card);color:var(--ink);border:2px solid var(--line);padding:6px 12px;border-radius:10px;font-size:13px;font-weight:700;box-shadow:var(--shadow-sm)}
+.chip.on{background:var(--accent);color:var(--on-accent)}
+
+.conf{display:flex;align-items:center;gap:14px}
+.conf-num{font-family:"Space Mono",monospace;font-size:34px;font-weight:700;min-width:92px;text-align:center;background:var(--accent);color:var(--on-accent);border-radius:12px;padding:2px 8px;border:2.5px solid var(--line)}
+input[type=range]{-webkit-appearance:none;appearance:none;background:var(--soft);height:12px;padding:0;border-radius:99px;border:2px solid var(--line);box-shadow:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--card);border:2.5px solid var(--line);box-shadow:var(--shadow-sm)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--card);border:2.5px solid var(--line)}
+
+details{margin-top:14px}
+summary{list-style:none;cursor:pointer;font-size:13px;font-weight:700;font-family:"Space Mono",monospace;text-decoration:underline;text-underline-offset:3px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"[+] "}
+details[open] summary::before{content:"[–] "}
+
+.notice{font-size:14px;font-weight:700;padding:10px 14px;margin:10px 0;display:flex;gap:10px;align-items:center;border:2.5px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--shadow-sm)}
+.notice .dot{width:12px;height:12px;border-radius:50%;flex:none;border:2px solid var(--line)}
+.notice.warn{background:var(--pop)} .notice.warn .dot{background:var(--warn)}
+.notice.ok .dot{background:var(--good)}
+.notice.info .dot{background:var(--bg)}
+
+.item{padding:14px 0;border-top:2px dashed var(--hair)}
+.item:first-child{border-top:0;padding-top:2px}
+.item .t{font-weight:700;cursor:pointer}
+.meta{font-size:12px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;margin-top:5px;align-items:center;font-family:"Space Mono",monospace}
+.meta .c{font-weight:700;color:var(--on-accent);background:var(--accent);padding:0 6px;border-radius:6px}
+.tag{font-weight:700;border:1.5px solid currentColor;border-radius:6px;padding:0 6px}
+.tag.yes{color:var(--good)} .tag.no{color:var(--bad)} .tag.due{color:var(--warn)}
+.acts{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
+.acts button{background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:10px;padding:7px 12px;font-size:13px;font-weight:700;box-shadow:var(--shadow-sm)}
+.acts .yes{background:var(--accent);color:var(--on-accent)}
+.acts .snooze{margin-left:auto}
+.empty{color:var(--muted);font-size:14px;padding:4px 0;font-family:"Space Mono",monospace}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center}
+.stat b{display:block;font-family:"Space Mono",monospace;font-size:22px;font-weight:700}
+.stat span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.tip{font-size:13px;color:var(--muted);margin:12px 0 0}
+.bar{height:12px;border-radius:99px;background:var(--soft);border:2px solid var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.insight{padding:10px 0;border-top:2px dashed var(--hair);font-size:14px}
+.insight:first-child{border-top:0;padding-top:0}
+
+.seg{display:flex;gap:8px;margin-bottom:14px}
+.seg button{flex:1;background:var(--card);border:2px solid var(--line);border-radius:10px;padding:8px;font-size:13px;font-weight:700;box-shadow:var(--shadow-sm)}
+.seg button.on{background:var(--accent);color:var(--on-accent)}
+
+.streak{white-space:nowrap;font-family:"Space Mono",monospace;font-size:14px;font-weight:700;background:var(--pop);color:#111;border:2px solid var(--line);padding:7px 11px;border-radius:12px;box-shadow:var(--shadow-sm)}
+
+nav{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:10}
+nav .in{display:flex;max-width:536px;margin:0 auto;background:var(--card);border:2.5px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:5px;gap:4px}
+nav button{flex:1;color:var(--ink);padding:7px 4px 8px;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;border-radius:12px;text-transform:uppercase;letter-spacing:.04em}
+nav button.on{background:var(--accent);color:var(--on-accent)}
+nav svg{width:20px;height:20px}
+.badge{position:absolute;top:2px;left:calc(50% + 6px);background:var(--warn);color:#fff;border:2px solid var(--line);border-radius:999px;font-size:10px;font-weight:700;min-width:18px;height:18px;line-height:14px;padding:0 4px}
+.view{display:none}.view.on{display:block}
+
+.sheet-bg{position:fixed;inset:0;background:rgba(17,17,17,.45);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.sheet-bg.on{display:flex}
+.sheet{background:var(--card);width:100%;max-width:560px;border:2.5px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;padding:10px 18px calc(24px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}
+.grip{width:44px;height:6px;border-radius:99px;background:var(--line);margin:2px auto 14px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--accent);color:var(--on-accent);border:2px solid var(--line);padding:9px 16px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;white-space:nowrap;box-shadow:var(--shadow-sm)}
+.toast.on{opacity:1}
+
+.themes{display:flex;gap:12px;flex-wrap:wrap}
+.theme-btn{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.theme-btn i{width:40px;height:40px;border-radius:12px;display:block;border:2.5px solid var(--line);box-shadow:var(--shadow-sm)}
+.theme-btn.on i{outline:3px solid var(--accent);outline-offset:3px}
+.cat-chip{display:inline-flex;align-items:center;gap:6px}
+.cat-chip a{cursor:pointer}
+ol{padding-left:20px;margin:0;font-size:14px}
+ol li{margin:5px 0}
+.storage{font-size:11px;color:var(--muted);text-align:center;margin-top:24px;font-family:"Space Mono",monospace}
+.hdr{background:var(--card);border:2.5px solid var(--line);border-radius:18px;padding:14px 14px;box-shadow:var(--shadow);margin-bottom:4px}
+
+.mono{font-family:"Space Mono",monospace;font-size:13px;font-weight:700;word-break:break-all}
+.wrapkey{background:var(--soft);border:2px dashed var(--line);border-radius:10px;padding:10px;margin-top:10px;user-select:all;-webkit-user-select:all}
+.keybox{border:2px solid var(--line);border-radius:14px;padding:12px;margin-top:14px;font-size:14px;background:var(--card)}
+.keybox.warn{background:var(--pop);color:#111}
+.relay{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:2px dashed var(--hair)}
+.relay:first-child{border-top:0}
+.relay .dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);flex:none}
+.relay .link{padding:2px 9px}
+label.check{display:flex;align-items:center;gap:10px;text-transform:none;letter-spacing:0;font-family:inherit;font-size:14px;font-weight:600}
+label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="row between hdr">
+    <div>
+      <h1>Prediction Journal</h1>
+      <div class="sub" id="today-label"></div>
+    </div>
+    <div class="row" style="gap:6px">
+      <button class="icon-btn" id="theme-quick" aria-label="Theme" title="Theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg></button>
+      <span class="streak" title="Day streak">🔥 <span id="streak">0</span></span>
+    </div>
+  </header>
+
+  <!-- TODAY -->
+  <section class="view on" id="v-today">
+    <div id="banners"></div>
+
+    <div class="section" id="new-card">
+      <h2 id="form-title">Today's prediction</h2>
+      <textarea id="f-text" class="big-input" placeholder="I predict that…"></textarea>
+      <details id="ideas"><summary>Need an idea?</summary><div class="chips" id="starters" style="margin-top:10px"></div></details>
+
+      <label>Confidence</label>
+      <div class="conf"><div class="conf-num" id="conf-out">70%</div><input type="range" id="f-conf" min="50" max="99" value="70" class="grow"></div>
+      <div class="chips" id="conf-chips" style="margin-top:10px"></div>
+
+      <label for="f-due">I'll know by</label>
+      <div class="row">
+        <input type="date" id="f-due" class="grow">
+        <select id="f-cat" style="width:40%"></select>
+      </div>
+      <div class="chips" id="due-chips" style="margin-top:10px"></div>
+
+      <details><summary>Add reasoning</summary>
+        <textarea id="f-note" placeholder="Why I think so, and what would change my mind" style="margin-top:10px"></textarea>
+      </details>
+
+      <p class="tip">50% is a coin flip. If you'd bet against it, flip the wording.</p>
+      <div style="margin-top:16px"><button class="btn" id="save-btn">Save prediction</button></div>
+    </div>
+
+    <div class="section">
+      <div class="row between"><h2>Ready to score</h2><span class="sub" id="due-count" style="margin-top:-12px"></span></div>
+      <div id="due-list"></div>
+    </div>
+
+    <div class="section">
+      <h2>Coming up</h2>
+      <div id="upcoming-list"></div>
+    </div>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="view" id="v-history">
+    <div class="section">
+      <div class="seg" id="hist-seg">
+        <button data-f="open" class="on">Open</button>
+        <button data-f="resolved">Scored</button>
+        <button data-f="all">All</button>
+      </div>
+      <input id="search" placeholder="Search" style="margin-bottom:10px">
+      <div id="hist-list"></div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="view" id="v-stats">
+    <div class="section">
+      <h2>Scorecard</h2>
+      <div class="stats">
+        <div class="stat"><b id="s-total">0</b><span>Made</span></div>
+        <div class="stat"><b id="s-resolved">0</b><span>Scored</span></div>
+        <div class="stat"><b id="s-hit">–</b><span>Correct</span></div>
+        <div class="stat"><b id="s-brier">–</b><span>Brier</span></div>
+      </div>
+      <p class="tip">Brier: 0 is perfect, 0.25 equals always guessing 50%. Lower is better.</p>
+    </div>
+    <div class="section">
+      <h2>Calibration</h2>
+      <div id="calib"></div>
+      <p class="tip">Dots on the dashed line mean your confidence matches reality.</p>
+    </div>
+    <div class="section">
+      <h2>Insights</h2>
+      <div id="insights"></div>
+    </div>
+    <div class="section">
+      <h2>By category</h2>
+      <div id="by-cat"></div>
+    </div>
+  </section>
+
+  <!-- MORE -->
+  <section class="view" id="v-more">
+    <div class="section">
+      <h2>Nostr sync</h2>
+      <div id="nostr-box"></div>
+    </div>
+
+    <div class="section" id="theme-card">
+      <h2>Theme</h2>
+      <div class="themes" id="themes"></div>
+    </div>
+
+    <div class="section">
+      <h2>Weekly review</h2>
+      <ol>
+        <li>Which miss surprised me most, and what did I overlook?</li>
+        <li>Where was I overconfident?</li>
+        <li>What will I change next week?</li>
+      </ol>
+      <textarea id="review" placeholder="This week's notes" style="margin-top:12px"></textarea>
+      <div class="row between" style="margin-top:10px">
+        <span></span><button class="link" id="save-review">Save review</button>
+      </div>
+      <div id="review-list" style="margin-top:8px"></div>
+    </div>
+
+    <div class="section">
+      <h2>Categories</h2>
+      <div class="chips" id="cat-manage"></div>
+      <div class="row" style="margin-top:12px">
+        <input id="new-cat" placeholder="New category">
+        <button class="link" id="add-cat">Add</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Backup</h2>
+      <div class="row" style="gap:8px">
+        <button class="link" id="copy-json">Copy backup</button>
+        <button class="link" id="copy-csv">Copy as CSV</button>
+      </div>
+      <details><summary>Restore from backup</summary>
+        <textarea id="import" placeholder="Paste backup JSON" style="margin-top:10px"></textarea>
+        <button class="link" id="do-import" style="margin-top:10px">Restore</button>
+      </details>
+    </div>
+
+    <div class="section">
+      <h2>How it works</h2>
+      <ol>
+        <li>Each day, write one prediction with a confidence and a date you'll know by.</li>
+        <li>When the date arrives, score it under <b>Ready to score</b>.</li>
+        <li>After 20–30 scored, Stats shows where your confidence runs hot or cold.</li>
+      </ol>
+      <p class="tip">Your journal lives on this device and, once you log in with Nostr, encrypted on your relays. It does not depend on Claude.</p>
+      <p class="tip">Write it so a stranger could judge it. "Ships by Dec 1" beats "goes well".</p>
+    </div>
+    <div class="storage" id="storage-note"></div>
+  </section>
+</div>
+
+<nav><div class="in">
+  <button data-v="today" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Today<span id="nav-badge"></span></button>
+  <button data-v="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>History</button>
+  <button data-v="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Stats</button>
+  <button data-v="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>More</button>
+</div></nav>
+
+<div class="sheet-bg" id="sheet-bg"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>(()=>{var xr=Object.defineProperty;var Hs=(e,t,n)=>t in e?xr(e,t,{enumerable:!0,configurable:!0,writable:!0,value:n}):e[t]=n;var Ms=(e,t)=>{for(var n in t)xr(e,n,{get:t[n],enumerable:!0})};var E=(e,t,n)=>Hs(e,typeof t!="symbol"?t+"":t,n);function Qe(e){return e instanceof Uint8Array||ArrayBuffer.isView(e)&&e.constructor.name==="Uint8Array"}function de(e,t=""){if(!Number.isSafeInteger(e)||e<0){let n=t&&`"${t}" `;throw new Error(`${n}expected integer >= 0, got ${e}`)}}function M(e,t,n=""){let r=Qe(e),o=e?.length,s=t!==void 0;if(!r||s&&o!==t){let i=n&&`"${n}" `,a=s?` of length ${t}`:"",c=r?`length=${o}`:`type=${typeof e}`;throw new Error(i+"expected Uint8Array"+a+", got "+c)}return e}function Ue(e){if(typeof e!="function"||typeof e.create!="function")throw new Error("Hash must wrapped by utils.createHasher");de(e.outputLen),de(e.blockLen)}function $e(e,t=!0){if(e.destroyed)throw new Error("Hash instance has been destroyed");if(t&&e.finished)throw new Error("Hash#digest() has already been called")}function Er(e,t){M(e,void 0,"digestInto() output");let n=t.outputLen;if(e.length<n)throw new Error('"digestInto() output" expected to be of length >='+n)}function Ee(...e){for(let t=0;t<e.length;t++)e[t].fill(0)}function ft(e){return new DataView(e.buffer,e.byteOffset,e.byteLength)}function me(e,t){return e<<32-t|e>>>t}var Sr=typeof Uint8Array.from([]).toHex=="function"&&typeof Uint8Array.fromHex=="function",Ps=Array.from({length:256},(e,t)=>t.toString(16).padStart(2,"0"));function P(e){if(M(e),Sr)return e.toHex();let t="";for(let n=0;n<e.length;n++)t+=Ps[e[n]];return t}var ve={_0:48,_9:57,A:65,F:70,a:97,f:102};function vr(e){if(e>=ve._0&&e<=ve._9)return e-ve._0;if(e>=ve.A&&e<=ve.F)return e-(ve.A-10);if(e>=ve.a&&e<=ve.f)return e-(ve.a-10)}function q(e){if(typeof e!="string")throw new Error("hex string expected, got "+typeof e);if(Sr)return Uint8Array.fromHex(e);let t=e.length,n=t/2;if(t%2)throw new Error("hex string expected, got unpadded hex of length "+t);let r=new Uint8Array(n);for(let o=0,s=0;o<n;o++,s+=2){let i=vr(e.charCodeAt(s)),a=vr(e.charCodeAt(s+1));if(i===void 0||a===void 0){let c=e[s]+e[s+1];throw new Error('hex string expected, got non-hex character "'+c+'" at index '+s)}r[o]=i*16+a}return r}function W(...e){let t=0;for(let r=0;r<e.length;r++){let o=e[r];M(o),t+=o.length}let n=new Uint8Array(t);for(let r=0,o=0;r<e.length;r++){let s=e[r];n.set(s,o),o+=s.length}return n}function Ar(e,t={}){let n=(o,s)=>e(s).update(o).digest(),r=e(void 0);return n.outputLen=r.outputLen,n.blockLen=r.blockLen,n.create=o=>e(o),Object.assign(n,t),Object.freeze(n)}function ue(e=32){let t=typeof globalThis=="object"?globalThis.crypto:null;if(typeof t?.getRandomValues!="function")throw new Error("crypto.getRandomValues must be defined");return t.getRandomValues(new Uint8Array(e))}var Br=e=>({oid:Uint8Array.from([6,9,96,134,72,1,101,3,4,2,e])});function _r(e,t,n){return e&t^~e&n}function Rr(e,t,n){return e&t^e&n^t&n}var ut=class{constructor(t,n,r,o){E(this,"blockLen");E(this,"outputLen");E(this,"padOffset");E(this,"isLE");E(this,"buffer");E(this,"view");E(this,"finished",!1);E(this,"length",0);E(this,"pos",0);E(this,"destroyed",!1);this.blockLen=t,this.outputLen=n,this.padOffset=r,this.isLE=o,this.buffer=new Uint8Array(t),this.view=ft(this.buffer)}update(t){$e(this),M(t);let{view:n,buffer:r,blockLen:o}=this,s=t.length;for(let i=0;i<s;){let a=Math.min(o-this.pos,s-i);if(a===o){let c=ft(t);for(;o<=s-i;i+=o)this.process(c,i);continue}r.set(t.subarray(i,i+a),this.pos),this.pos+=a,i+=a,this.pos===o&&(this.process(n,0),this.pos=0)}return this.length+=t.length,this.roundClean(),this}digestInto(t){$e(this),Er(t,this),this.finished=!0;let{buffer:n,view:r,blockLen:o,isLE:s}=this,{pos:i}=this;n[i++]=128,Ee(this.buffer.subarray(i)),this.padOffset>o-i&&(this.process(r,0),i=0);for(let u=i;u<o;u++)n[u]=0;r.setBigUint64(o-8,BigInt(this.length*8),s),this.process(r,0);let a=ft(t),c=this.outputLen;if(c%4)throw new Error("_sha2: outputLen must be aligned to 32bit");let l=c/4,f=this.get();if(l>f.length)throw new Error("_sha2: outputLen bigger than state");for(let u=0;u<l;u++)a.setUint32(4*u,f[u],s)}digest(){let{buffer:t,outputLen:n}=this;this.digestInto(t);let r=t.slice(0,n);return this.destroy(),r}_cloneInto(t){t||(t=new this.constructor),t.set(...this.get());let{blockLen:n,buffer:r,length:o,finished:s,destroyed:i,pos:a}=this;return t.destroyed=i,t.finished=s,t.length=o,t.pos=a,o%n&&t.buffer.set(r),t}clone(){return this._cloneInto()}},Se=Uint32Array.from([1779033703,3144134277,1013904242,2773480762,1359893119,2600822924,528734635,1541459225]);var qs=Uint32Array.from([1116352408,1899447441,3049323471,3921009573,961987163,1508970993,2453635748,2870763221,3624381080,310598401,607225278,1426881987,1925078388,2162078206,2614888103,3248222580,3835390401,4022224774,264347078,604807628,770255983,1249150122,1555081692,1996064986,2554220882,2821834349,2952996808,3210313671,3336571891,3584528711,113926993,338241895,666307205,773529912,1294757372,1396182291,1695183700,1986661051,2177026350,2456956037,2730485921,2820302411,3259730800,3345764771,3516065817,3600352804,4094571909,275423344,430227734,506948616,659060556,883997877,958139571,1322822218,1537002063,1747873779,1955562222,2024104815,2227730452,2361852424,2428436474,2756734187,3204031479,3329325298]),Te=new Uint32Array(64),Wt=class extends ut{constructor(t){super(64,t,8,!1)}get(){let{A:t,B:n,C:r,D:o,E:s,F:i,G:a,H:c}=this;return[t,n,r,o,s,i,a,c]}set(t,n,r,o,s,i,a,c){this.A=t|0,this.B=n|0,this.C=r|0,this.D=o|0,this.E=s|0,this.F=i|0,this.G=a|0,this.H=c|0}process(t,n){for(let u=0;u<16;u++,n+=4)Te[u]=t.getUint32(n,!1);for(let u=16;u<64;u++){let y=Te[u-15],p=Te[u-2],g=me(y,7)^me(y,18)^y>>>3,w=me(p,17)^me(p,19)^p>>>10;Te[u]=w+Te[u-7]+g+Te[u-16]|0}let{A:r,B:o,C:s,D:i,E:a,F:c,G:l,H:f}=this;for(let u=0;u<64;u++){let y=me(a,6)^me(a,11)^me(a,25),p=f+y+_r(a,c,l)+qs[u]+Te[u]|0,w=(me(r,2)^me(r,13)^me(r,22))+Rr(r,o,s)|0;f=l,l=c,c=a,a=i+p|0,i=s,s=o,o=r,r=p+w|0}r=r+this.A|0,o=o+this.B|0,s=s+this.C|0,i=i+this.D|0,a=a+this.E|0,c=c+this.F|0,l=l+this.G|0,f=f+this.H|0,this.set(r,o,s,i,a,c,l,f)}roundClean(){Ee(Te)}destroy(){this.set(0,0,0,0,0,0,0,0),Ee(this.buffer)}},Kt=class extends Wt{constructor(){super(32);E(this,"A",Se[0]|0);E(this,"B",Se[1]|0);E(this,"C",Se[2]|0);E(this,"D",Se[3]|0);E(this,"E",Se[4]|0);E(this,"F",Se[5]|0);E(this,"G",Se[6]|0);E(this,"H",Se[7]|0)}};var ee=Ar(()=>new Kt,Br(1));var Zt=BigInt(0),zt=BigInt(1);function et(e,t=""){if(typeof e!="boolean"){let n=t&&`"${t}" `;throw new Error(n+"expected boolean, got type="+typeof e)}return e}function Tr(e){if(typeof e=="bigint"){if(!ht(e))throw new Error("positive bigint expected, got "+e)}else de(e);return e}function tt(e){let t=Tr(e).toString(16);return t.length&1?"0"+t:t}function Lr(e){if(typeof e!="string")throw new Error("hex string expected, got "+typeof e);return e===""?Zt:BigInt("0x"+e)}function Le(e){return Lr(P(e))}function jt(e){return Lr(P(Ds(M(e)).reverse()))}function dt(e,t){de(t),e=Tr(e);let n=q(e.toString(16).padStart(t*2,"0"));if(n.length!==t)throw new Error("number too large");return n}function Ft(e,t){return dt(e,t).reverse()}function Ds(e){return Uint8Array.from(e)}function kr(e){return Uint8Array.from(e,(t,n)=>{let r=t.charCodeAt(0);if(t.length!==1||r>127)throw new Error(`string contains non-ASCII character "${e[n]}" with code ${r} at position ${n}`);return r})}var ht=e=>typeof e=="bigint"&&Zt<=e;function Vs(e,t,n){return ht(e)&&ht(t)&&ht(n)&&t<=e&&e<n}function Ir(e,t,n,r){if(!Vs(t,n,r))throw new Error("expected valid "+e+": "+n+" <= n < "+r+", got "+t)}function Xt(e){let t;for(t=0;e>Zt;e>>=zt,t+=1);return t}var nt=e=>(zt<<BigInt(e))-zt;function Cr(e,t,n){if(de(e,"hashLen"),de(t,"qByteLen"),typeof n!="function")throw new Error("hmacFn must be a function");let r=m=>new Uint8Array(m),o=Uint8Array.of(),s=Uint8Array.of(0),i=Uint8Array.of(1),a=1e3,c=r(e),l=r(e),f=0,u=()=>{c.fill(1),l.fill(0),f=0},y=(...m)=>n(l,W(c,...m)),p=(m=o)=>{l=y(s,m),c=y(),m.length!==0&&(l=y(i,m),c=y())},g=()=>{if(f++>=a)throw new Error("drbg: tried max amount of iterations");let m=0,v=[];for(;m<t;){c=y();let B=c.slice();v.push(B),m+=c.length}return W(...v)};return(m,v)=>{u(),p(m);let B;for(;!(B=v(g()));)p();return u(),B}}function rt(e,t={},n={}){if(!e||typeof e!="object")throw new Error("expected valid options object");function r(s,i,a){let c=e[s];if(a&&c===void 0)return;let l=typeof c;if(l!==i||c===null)throw new Error(`param "${s}" is invalid: expected ${i}, got ${l}`)}let o=(s,i)=>Object.entries(s).forEach(([a,c])=>r(a,c,i));o(t,!1),o(n,!0)}function Jt(e){let t=new WeakMap;return(n,...r)=>{let o=t.get(n);if(o!==void 0)return o;let s=e(n,...r);return t.set(n,s),s}}var ce=BigInt(0),ie=BigInt(1),Oe=BigInt(2),Nr=BigInt(3),Hr=BigInt(4),Mr=BigInt(5),Gs=BigInt(7),Pr=BigInt(8),$s=BigInt(9),qr=BigInt(16);function we(e,t){let n=e%t;return n>=ce?n:t+n}function he(e,t,n){let r=e;for(;t-- >ce;)r*=r,r%=n;return r}function Ur(e,t){if(e===ce)throw new Error("invert: expected non-zero number");if(t<=ce)throw new Error("invert: expected positive modulus, got "+t);let n=we(e,t),r=t,o=ce,s=ie,i=ie,a=ce;for(;n!==ce;){let l=r/n,f=r%n,u=o-i*l,y=s-a*l;r=n,n=f,o=i,s=a,i=u,a=y}if(r!==ie)throw new Error("invert: does not exist");return we(o,t)}function Qt(e,t,n){if(!e.eql(e.sqr(t),n))throw new Error("Cannot find square root")}function Dr(e,t){let n=(e.ORDER+ie)/Hr,r=e.pow(t,n);return Qt(e,r,t),r}function Ws(e,t){let n=(e.ORDER-Mr)/Pr,r=e.mul(t,Oe),o=e.pow(r,n),s=e.mul(t,o),i=e.mul(e.mul(s,Oe),o),a=e.mul(s,e.sub(i,e.ONE));return Qt(e,a,t),a}function Ks(e){let t=We(e),n=Vr(e),r=n(t,t.neg(t.ONE)),o=n(t,r),s=n(t,t.neg(r)),i=(e+Gs)/qr;return(a,c)=>{let l=a.pow(c,i),f=a.mul(l,r),u=a.mul(l,o),y=a.mul(l,s),p=a.eql(a.sqr(f),c),g=a.eql(a.sqr(u),c);l=a.cmov(l,f,p),f=a.cmov(y,u,g);let w=a.eql(a.sqr(f),c),m=a.cmov(l,f,w);return Qt(a,m,c),m}}function Vr(e){if(e<Nr)throw new Error("sqrt is not defined for small field");let t=e-ie,n=0;for(;t%Oe===ce;)t/=Oe,n++;let r=Oe,o=We(e);for(;Or(o,r)===1;)if(r++>1e3)throw new Error("Cannot find square root: probably non-prime P");if(n===1)return Dr;let s=o.pow(r,t),i=(t+ie)/Oe;return function(c,l){if(c.is0(l))return l;if(Or(c,l)!==1)throw new Error("Cannot find square root");let f=n,u=c.mul(c.ONE,s),y=c.pow(l,t),p=c.pow(l,i);for(;!c.eql(y,c.ONE);){if(c.is0(y))return c.ZERO;let g=1,w=c.sqr(y);for(;!c.eql(w,c.ONE);)if(g++,w=c.sqr(w),g===f)throw new Error("Cannot find square root");let m=ie<<BigInt(f-g-1),v=c.pow(u,m);f=g,u=c.sqr(v),y=c.mul(y,u),p=c.mul(p,v)}return p}}function zs(e){return e%Hr===Nr?Dr:e%Pr===Mr?Ws:e%qr===$s?Ks(e):Vr(e)}var Zs=["create","isValid","is0","neg","inv","sqrt","sqr","eql","add","sub","mul","pow","div","addN","subN","mulN","sqrN"];function en(e){let t={ORDER:"bigint",BYTES:"number",BITS:"number"},n=Zs.reduce((r,o)=>(r[o]="function",r),t);return rt(e,n),e}function js(e,t,n){if(n<ce)throw new Error("invalid exponent, negatives unsupported");if(n===ce)return e.ONE;if(n===ie)return t;let r=e.ONE,o=t;for(;n>ce;)n&ie&&(r=e.mul(r,o)),o=e.sqr(o),n>>=ie;return r}function pt(e,t,n=!1){let r=new Array(t.length).fill(n?e.ZERO:void 0),o=t.reduce((i,a,c)=>e.is0(a)?i:(r[c]=i,e.mul(i,a)),e.ONE),s=e.inv(o);return t.reduceRight((i,a,c)=>e.is0(a)?i:(r[c]=e.mul(i,r[c]),e.mul(i,a)),s),r}function Or(e,t){let n=(e.ORDER-ie)/Oe,r=e.pow(t,n),o=e.eql(r,e.ONE),s=e.eql(r,e.ZERO),i=e.eql(r,e.neg(e.ONE));if(!o&&!s&&!i)throw new Error("invalid Legendre symbol result");return o?1:s?0:-1}function Fs(e,t){t!==void 0&&de(t);let n=t!==void 0?t:e.toString(2).length,r=Math.ceil(n/8);return{nBitLength:n,nByteLength:r}}var Yt=class{constructor(t,n={}){E(this,"ORDER");E(this,"BITS");E(this,"BYTES");E(this,"isLE");E(this,"ZERO",ce);E(this,"ONE",ie);E(this,"_lengths");E(this,"_sqrt");E(this,"_mod");if(t<=ce)throw new Error("invalid field: expected ORDER > 0, got "+t);let r;this.isLE=!1,n!=null&&typeof n=="object"&&(typeof n.BITS=="number"&&(r=n.BITS),typeof n.sqrt=="function"&&(this.sqrt=n.sqrt),typeof n.isLE=="boolean"&&(this.isLE=n.isLE),n.allowedLengths&&(this._lengths=n.allowedLengths?.slice()),typeof n.modFromBytes=="boolean"&&(this._mod=n.modFromBytes));let{nBitLength:o,nByteLength:s}=Fs(t,r);if(s>2048)throw new Error("invalid field: expected ORDER of <= 2048 bytes");this.ORDER=t,this.BITS=o,this.BYTES=s,this._sqrt=void 0,Object.preventExtensions(this)}create(t){return we(t,this.ORDER)}isValid(t){if(typeof t!="bigint")throw new Error("invalid field element: expected bigint, got "+typeof t);return ce<=t&&t<this.ORDER}is0(t){return t===ce}isValidNot0(t){return!this.is0(t)&&this.isValid(t)}isOdd(t){return(t&ie)===ie}neg(t){return we(-t,this.ORDER)}eql(t,n){return t===n}sqr(t){return we(t*t,this.ORDER)}add(t,n){return we(t+n,this.ORDER)}sub(t,n){return we(t-n,this.ORDER)}mul(t,n){return we(t*n,this.ORDER)}pow(t,n){return js(this,t,n)}div(t,n){return we(t*Ur(n,this.ORDER),this.ORDER)}sqrN(t){return t*t}addN(t,n){return t+n}subN(t,n){return t-n}mulN(t,n){return t*n}inv(t){return Ur(t,this.ORDER)}sqrt(t){return this._sqrt||(this._sqrt=zs(this.ORDER)),this._sqrt(this,t)}toBytes(t){return this.isLE?Ft(t,this.BYTES):dt(t,this.BYTES)}fromBytes(t,n=!1){M(t);let{_lengths:r,BYTES:o,isLE:s,ORDER:i,_mod:a}=this;if(r){if(!r.includes(t.length)||t.length>o)throw new Error("Field.fromBytes: expected "+r+" bytes, got "+t.length);let l=new Uint8Array(o);l.set(t,s?0:l.length-t.length),t=l}if(t.length!==o)throw new Error("Field.fromBytes: expected "+o+" bytes, got "+t.length);let c=s?jt(t):Le(t);if(a&&(c=we(c,i)),!n&&!this.isValid(c))throw new Error("invalid field element: outside of range 0..ORDER");return c}invertBatch(t){return pt(this,t)}cmov(t,n,r){return r?n:t}};function We(e,t={}){return new Yt(e,t)}function Gr(e){if(typeof e!="bigint")throw new Error("field order must be bigint");let t=e.toString(2).length;return Math.ceil(t/8)}function tn(e){let t=Gr(e);return t+Math.ceil(t/2)}function gt(e,t,n=!1){M(e);let r=e.length,o=Gr(t),s=tn(t);if(r<16||r<s||r>1024)throw new Error("expected "+s+"-1024 bytes of input, got "+r);let i=n?jt(e):Le(e),a=we(i,t-ie)+ie;return n?Ft(a,o):dt(a,o)}var Ke=BigInt(0),Ne=BigInt(1);function ot(e,t){let n=t.negate();return e?n:t}function sn(e,t){let n=pt(e.Fp,t.map(r=>r.Z));return t.map((r,o)=>e.fromAffine(r.toAffine(n[o])))}function zr(e,t){if(!Number.isSafeInteger(e)||e<=0||e>t)throw new Error("invalid window size, expected [1.."+t+"], got W="+e)}function nn(e,t){zr(e,t);let n=Math.ceil(t/e)+1,r=2**(e-1),o=2**e,s=nt(e),i=BigInt(e);return{windows:n,windowSize:r,mask:s,maxNumber:o,shiftBy:i}}function $r(e,t,n){let{windowSize:r,mask:o,maxNumber:s,shiftBy:i}=n,a=Number(e&o),c=e>>i;a>r&&(a-=s,c+=Ne);let l=t*r,f=l+Math.abs(a)-1,u=a===0,y=a<0,p=t%2!==0;return{nextN:c,offset:f,isZero:u,isNeg:y,isNegF:p,offsetF:l}}var rn=new WeakMap,Zr=new WeakMap;function on(e){return Zr.get(e)||1}function Wr(e){if(e!==Ke)throw new Error("invalid wNAF")}var yt=class{constructor(t,n){E(this,"BASE");E(this,"ZERO");E(this,"Fn");E(this,"bits");this.BASE=t.BASE,this.ZERO=t.ZERO,this.Fn=t.Fn,this.bits=n}_unsafeLadder(t,n,r=this.ZERO){let o=t;for(;n>Ke;)n&Ne&&(r=r.add(o)),o=o.double(),n>>=Ne;return r}precomputeWindow(t,n){let{windows:r,windowSize:o}=nn(n,this.bits),s=[],i=t,a=i;for(let c=0;c<r;c++){a=i,s.push(a);for(let l=1;l<o;l++)a=a.add(i),s.push(a);i=a.double()}return s}wNAF(t,n,r){if(!this.Fn.isValid(r))throw new Error("invalid scalar");let o=this.ZERO,s=this.BASE,i=nn(t,this.bits);for(let a=0;a<i.windows;a++){let{nextN:c,offset:l,isZero:f,isNeg:u,isNegF:y,offsetF:p}=$r(r,a,i);r=c,f?s=s.add(ot(y,n[p])):o=o.add(ot(u,n[l]))}return Wr(r),{p:o,f:s}}wNAFUnsafe(t,n,r,o=this.ZERO){let s=nn(t,this.bits);for(let i=0;i<s.windows&&r!==Ke;i++){let{nextN:a,offset:c,isZero:l,isNeg:f}=$r(r,i,s);if(r=a,!l){let u=n[c];o=o.add(f?u.negate():u)}}return Wr(r),o}getPrecomputes(t,n,r){let o=rn.get(n);return o||(o=this.precomputeWindow(n,t),t!==1&&(typeof r=="function"&&(o=r(o)),rn.set(n,o))),o}cached(t,n,r){let o=on(t);return this.wNAF(o,this.getPrecomputes(o,t,r),n)}unsafe(t,n,r,o){let s=on(t);return s===1?this._unsafeLadder(t,n,o):this.wNAFUnsafe(s,this.getPrecomputes(s,t,r),n,o)}createCache(t,n){zr(n,this.bits),Zr.set(t,n),rn.delete(t)}hasCache(t){return on(t)!==1}};function jr(e,t,n,r){let o=t,s=e.ZERO,i=e.ZERO;for(;n>Ke||r>Ke;)n&Ne&&(s=s.add(o)),r&Ne&&(i=i.add(o)),o=o.double(),n>>=Ne,r>>=Ne;return{p1:s,p2:i}}function Kr(e,t,n){if(t){if(t.ORDER!==e)throw new Error("Field.ORDER must match order: Fp == p, Fn == n");return en(t),t}else return We(e,{isLE:n})}function Fr(e,t,n={},r){if(r===void 0&&(r=e==="edwards"),!t||typeof t!="object")throw new Error(`expected valid ${e} CURVE object`);for(let c of["p","n","h"]){let l=t[c];if(!(typeof l=="bigint"&&l>Ke))throw new Error(`CURVE.${c} must be positive bigint`)}let o=Kr(t.p,n.Fp,r),s=Kr(t.n,n.Fn,r),a=["Gx","Gy","a",e==="weierstrass"?"b":"d"];for(let c of a)if(!o.isValid(t[c]))throw new Error(`CURVE.${c} must be valid field element of CURVE.Fp`);return t=Object.freeze(Object.assign({},t)),{CURVE:t,Fp:o,Fn:s}}function mt(e,t){return function(r){let o=e(r);return{secretKey:o,publicKey:t(o)}}}var wt=class{constructor(t,n){E(this,"oHash");E(this,"iHash");E(this,"blockLen");E(this,"outputLen");E(this,"finished",!1);E(this,"destroyed",!1);if(Ue(t),M(n,void 0,"key"),this.iHash=t.create(),typeof this.iHash.update!="function")throw new Error("Expected instance of class which extends utils.Hash");this.blockLen=this.iHash.blockLen,this.outputLen=this.iHash.outputLen;let r=this.blockLen,o=new Uint8Array(r);o.set(n.length>r?t.create().update(n).digest():n);for(let s=0;s<o.length;s++)o[s]^=54;this.iHash.update(o),this.oHash=t.create();for(let s=0;s<o.length;s++)o[s]^=106;this.oHash.update(o),Ee(o)}update(t){return $e(this),this.iHash.update(t),this}digestInto(t){$e(this),M(t,this.outputLen,"output"),this.finished=!0,this.iHash.digestInto(t),this.oHash.update(t),this.oHash.digestInto(t),this.destroy()}digest(){let t=new Uint8Array(this.oHash.outputLen);return this.digestInto(t),t}_cloneInto(t){t||(t=Object.create(Object.getPrototypeOf(this),{}));let{oHash:n,iHash:r,finished:o,destroyed:s,blockLen:i,outputLen:a}=this;return t=t,t.finished=o,t.destroyed=s,t.blockLen=i,t.outputLen=a,t.oHash=n._cloneInto(t.oHash),t.iHash=r._cloneInto(t.iHash),t}clone(){return this._cloneInto()}destroy(){this.destroyed=!0,this.oHash.destroy(),this.iHash.destroy()}},be=(e,t,n)=>new wt(e,t).update(n).digest();be.create=(e,t)=>new wt(e,t);var Xr=(e,t)=>(e+(e>=0?t:-t)/Jr)/t;function Xs(e,t,n){let[[r,o],[s,i]]=t,a=Xr(i*e,n),c=Xr(-o*e,n),l=e-a*r-c*s,f=-a*o-c*i,u=l<Ae,y=f<Ae;u&&(l=-l),y&&(f=-f);let p=nt(Math.ceil(Xt(n)/2))+ze;if(l<Ae||l>=p||f<Ae||f>=p)throw new Error("splitScalar (endomorphism): failed, k="+e);return{k1neg:u,k1:l,k2neg:y,k2:f}}function cn(e){if(!["compact","recovered","der"].includes(e))throw new Error('Signature format must be "compact", "recovered", or "der"');return e}function an(e,t){let n={};for(let r of Object.keys(t))n[r]=e[r]===void 0?t[r]:e[r];return et(n.lowS,"lowS"),et(n.prehash,"prehash"),n.format!==void 0&&cn(n.format),n}var ln=class extends Error{constructor(t=""){super(t)}},ke={Err:ln,_tlv:{encode:(e,t)=>{let{Err:n}=ke;if(e<0||e>256)throw new n("tlv.encode: wrong tag");if(t.length&1)throw new n("tlv.encode: unpadded data");let r=t.length/2,o=tt(r);if(o.length/2&128)throw new n("tlv.encode: long form length too big");let s=r>127?tt(o.length/2|128):"";return tt(e)+s+o+t},decode(e,t){let{Err:n}=ke,r=0;if(e<0||e>256)throw new n("tlv.encode: wrong tag");if(t.length<2||t[r++]!==e)throw new n("tlv.decode: wrong tlv");let o=t[r++],s=!!(o&128),i=0;if(!s)i=o;else{let c=o&127;if(!c)throw new n("tlv.decode(long): indefinite length not supported");if(c>4)throw new n("tlv.decode(long): byte length is too big");let l=t.subarray(r,r+c);if(l.length!==c)throw new n("tlv.decode: length bytes not complete");if(l[0]===0)throw new n("tlv.decode(long): zero leftmost byte");for(let f of l)i=i<<8|f;if(r+=c,i<128)throw new n("tlv.decode(long): not minimal encoding")}let a=t.subarray(r,r+i);if(a.length!==i)throw new n("tlv.decode: wrong value length");return{v:a,l:t.subarray(r+i)}}},_int:{encode(e){let{Err:t}=ke;if(e<Ae)throw new t("integer: negative integers are not allowed");let n=tt(e);if(Number.parseInt(n[0],16)&8&&(n="00"+n),n.length&1)throw new t("unexpected DER parsing assertion: unpadded hex");return n},decode(e){let{Err:t}=ke;if(e[0]&128)throw new t("invalid signature integer: negative");if(e[0]===0&&!(e[1]&128))throw new t("invalid signature integer: unnecessary leading zero");return Le(e)}},toSig(e){let{Err:t,_int:n,_tlv:r}=ke,o=M(e,void 0,"signature"),{v:s,l:i}=r.decode(48,o);if(i.length)throw new t("invalid signature: left bytes after parsing");let{v:a,l:c}=r.decode(2,s),{v:l,l:f}=r.decode(2,c);if(f.length)throw new t("invalid signature: left bytes after parsing");return{r:n.decode(a),s:n.decode(l)}},hexFromSig(e){let{_tlv:t,_int:n}=ke,r=t.encode(2,n.encode(e.r)),o=t.encode(2,n.encode(e.s)),s=r+o;return t.encode(48,s)}},Ae=BigInt(0),ze=BigInt(1),Jr=BigInt(2),bt=BigInt(3),Js=BigInt(4);function Yr(e,t={}){let n=Fr("weierstrass",e,t),{Fp:r,Fn:o}=n,s=n.CURVE,{h:i,n:a}=s;rt(t,{},{allowInfinityPoint:"boolean",clearCofactor:"function",isTorsionFree:"function",fromBytes:"function",toBytes:"function",endo:"object"});let{endo:c}=t;if(c&&(!r.is0(s.a)||typeof c.beta!="bigint"||!Array.isArray(c.basises)))throw new Error('invalid endo: expected "beta": bigint and "basises": array');let l=eo(r,o);function f(){if(!r.isOdd)throw new Error("compression is not supported: Field does not have .isOdd()")}function u(k,d,h){let{x,y:S}=d.toAffine(),_=r.toBytes(x);if(et(h,"isCompressed"),h){f();let b=!r.isOdd(S);return W(Qr(b),_)}else return W(Uint8Array.of(4),_,r.toBytes(S))}function y(k){M(k,void 0,"Point");let{publicKey:d,publicKeyUncompressed:h}=l,x=k.length,S=k[0],_=k.subarray(1);if(x===d&&(S===2||S===3)){let b=r.fromBytes(_);if(!r.isValid(b))throw new Error("bad point: is not on curve, wrong x");let R=w(b),A;try{A=r.sqrt(R)}catch(z){let V=z instanceof Error?": "+z.message:"";throw new Error("bad point: is not on curve, sqrt error"+V)}f();let T=r.isOdd(A);return(S&1)===1!==T&&(A=r.neg(A)),{x:b,y:A}}else if(x===h&&S===4){let b=r.BYTES,R=r.fromBytes(_.subarray(0,b)),A=r.fromBytes(_.subarray(b,b*2));if(!m(R,A))throw new Error("bad point: is not on curve");return{x:R,y:A}}else throw new Error(`bad point: got length ${x}, expected compressed=${d} or uncompressed=${h}`)}let p=t.toBytes||u,g=t.fromBytes||y;function w(k){let d=r.sqr(k),h=r.mul(d,k);return r.add(r.add(h,r.mul(k,s.a)),s.b)}function m(k,d){let h=r.sqr(d),x=w(k);return r.eql(h,x)}if(!m(s.Gx,s.Gy))throw new Error("bad curve params: generator point");let v=r.mul(r.pow(s.a,bt),Js),B=r.mul(r.sqr(s.b),BigInt(27));if(r.is0(r.add(v,B)))throw new Error("bad curve params: a or b");function C(k,d,h=!1){if(!r.isValid(d)||h&&r.is0(d))throw new Error(`bad point coordinate ${k}`);return d}function H(k){if(!(k instanceof N))throw new Error("Weierstrass Point expected")}function te(k){if(!c||!c.basises)throw new Error("no endo");return Xs(k,c.basises,o.ORDER)}let $=Jt((k,d)=>{let{X:h,Y:x,Z:S}=k;if(r.eql(S,r.ONE))return{x:h,y:x};let _=k.is0();d==null&&(d=_?r.ONE:r.inv(S));let b=r.mul(h,d),R=r.mul(x,d),A=r.mul(S,d);if(_)return{x:r.ZERO,y:r.ZERO};if(!r.eql(A,r.ONE))throw new Error("invZ was invalid");return{x:b,y:R}}),X=Jt(k=>{if(k.is0()){if(t.allowInfinityPoint&&!r.is0(k.Y))return;throw new Error("bad point: ZERO")}let{x:d,y:h}=k.toAffine();if(!r.isValid(d)||!r.isValid(h))throw new Error("bad point: x or y not field elements");if(!m(d,h))throw new Error("bad point: equation left != right");if(!k.isTorsionFree())throw new Error("bad point: not in prime-order subgroup");return!0});function j(k,d,h,x,S){return h=new N(r.mul(h.X,k),h.Y,h.Z),d=ot(x,d),h=ot(S,h),d.add(h)}let I=class I{constructor(d,h,x){E(this,"X");E(this,"Y");E(this,"Z");this.X=C("x",d),this.Y=C("y",h,!0),this.Z=C("z",x),Object.freeze(this)}static CURVE(){return s}static fromAffine(d){let{x:h,y:x}=d||{};if(!d||!r.isValid(h)||!r.isValid(x))throw new Error("invalid affine point");if(d instanceof I)throw new Error("projective point not allowed");return r.is0(h)&&r.is0(x)?I.ZERO:new I(h,x,r.ONE)}static fromBytes(d){let h=I.fromAffine(g(M(d,void 0,"point")));return h.assertValidity(),h}static fromHex(d){return I.fromBytes(q(d))}get x(){return this.toAffine().x}get y(){return this.toAffine().y}precompute(d=8,h=!0){return D.createCache(this,d),h||this.multiply(bt),this}assertValidity(){X(this)}hasEvenY(){let{y:d}=this.toAffine();if(!r.isOdd)throw new Error("Field doesn't support isOdd");return!r.isOdd(d)}equals(d){H(d);let{X:h,Y:x,Z:S}=this,{X:_,Y:b,Z:R}=d,A=r.eql(r.mul(h,R),r.mul(_,S)),T=r.eql(r.mul(x,R),r.mul(b,S));return A&&T}negate(){return new I(this.X,r.neg(this.Y),this.Z)}double(){let{a:d,b:h}=s,x=r.mul(h,bt),{X:S,Y:_,Z:b}=this,R=r.ZERO,A=r.ZERO,T=r.ZERO,U=r.mul(S,S),z=r.mul(_,_),V=r.mul(b,b),O=r.mul(S,_);return O=r.add(O,O),T=r.mul(S,b),T=r.add(T,T),R=r.mul(d,T),A=r.mul(x,V),A=r.add(R,A),R=r.sub(z,A),A=r.add(z,A),A=r.mul(R,A),R=r.mul(O,R),T=r.mul(x,T),V=r.mul(d,V),O=r.sub(U,V),O=r.mul(d,O),O=r.add(O,T),T=r.add(U,U),U=r.add(T,U),U=r.add(U,V),U=r.mul(U,O),A=r.add(A,U),V=r.mul(_,b),V=r.add(V,V),U=r.mul(V,O),R=r.sub(R,U),T=r.mul(V,z),T=r.add(T,T),T=r.add(T,T),new I(R,A,T)}add(d){H(d);let{X:h,Y:x,Z:S}=this,{X:_,Y:b,Z:R}=d,A=r.ZERO,T=r.ZERO,U=r.ZERO,z=s.a,V=r.mul(s.b,bt),O=r.mul(h,_),F=r.mul(x,b),J=r.mul(S,R),Q=r.add(h,x),Y=r.add(_,b);Q=r.mul(Q,Y),Y=r.add(O,F),Q=r.sub(Q,Y),Y=r.add(h,S);let ae=r.add(_,R);return Y=r.mul(Y,ae),ae=r.add(O,J),Y=r.sub(Y,ae),ae=r.add(x,S),A=r.add(b,R),ae=r.mul(ae,A),A=r.add(F,J),ae=r.sub(ae,A),U=r.mul(z,Y),A=r.mul(V,J),U=r.add(A,U),A=r.sub(F,U),U=r.add(F,U),T=r.mul(A,U),F=r.add(O,O),F=r.add(F,O),J=r.mul(z,J),Y=r.mul(V,Y),F=r.add(F,J),J=r.sub(O,J),J=r.mul(z,J),Y=r.add(Y,J),O=r.mul(F,Y),T=r.add(T,O),O=r.mul(ae,Y),A=r.mul(Q,A),A=r.sub(A,O),O=r.mul(Q,F),U=r.mul(ae,U),U=r.add(U,O),new I(A,T,U)}subtract(d){return this.add(d.negate())}is0(){return this.equals(I.ZERO)}multiply(d){let{endo:h}=t;if(!o.isValidNot0(d))throw new Error("invalid scalar: out of range");let x,S,_=b=>D.cached(this,b,R=>sn(I,R));if(h){let{k1neg:b,k1:R,k2neg:A,k2:T}=te(d),{p:U,f:z}=_(R),{p:V,f:O}=_(T);S=z.add(O),x=j(h.beta,U,V,b,A)}else{let{p:b,f:R}=_(d);x=b,S=R}return sn(I,[x,S])[0]}multiplyUnsafe(d){let{endo:h}=t,x=this;if(!o.isValid(d))throw new Error("invalid scalar: out of range");if(d===Ae||x.is0())return I.ZERO;if(d===ze)return x;if(D.hasCache(this))return this.multiply(d);if(h){let{k1neg:S,k1:_,k2neg:b,k2:R}=te(d),{p1:A,p2:T}=jr(I,x,_,R);return j(h.beta,A,T,S,b)}else return D.unsafe(x,d)}toAffine(d){return $(this,d)}isTorsionFree(){let{isTorsionFree:d}=t;return i===ze?!0:d?d(I,this):D.unsafe(this,a).is0()}clearCofactor(){let{clearCofactor:d}=t;return i===ze?this:d?d(I,this):this.multiplyUnsafe(i)}isSmallOrder(){return this.multiplyUnsafe(i).is0()}toBytes(d=!0){return et(d,"isCompressed"),this.assertValidity(),p(I,this,d)}toHex(d=!0){return P(this.toBytes(d))}toString(){return`<Point ${this.is0()?"ZERO":this.toHex()}>`}};E(I,"BASE",new I(s.Gx,s.Gy,r.ONE)),E(I,"ZERO",new I(r.ZERO,r.ONE,r.ZERO)),E(I,"Fp",r),E(I,"Fn",o);let N=I,G=o.BITS,D=new yt(N,t.endo?Math.ceil(G/2):G);return N.BASE.precompute(8),N}function Qr(e){return Uint8Array.of(e?2:3)}function eo(e,t){return{secretKey:t.BYTES,publicKey:1+e.BYTES,publicKeyUncompressed:1+2*e.BYTES,publicKeyHasPrefix:!0,signature:2*t.BYTES}}function Ys(e,t={}){let{Fn:n}=e,r=t.randomBytes||ue,o=Object.assign(eo(e.Fp,n),{seed:tn(n.ORDER)});function s(p){try{let g=n.fromBytes(p);return n.isValidNot0(g)}catch{return!1}}function i(p,g){let{publicKey:w,publicKeyUncompressed:m}=o;try{let v=p.length;return g===!0&&v!==w||g===!1&&v!==m?!1:!!e.fromBytes(p)}catch{return!1}}function a(p=r(o.seed)){return gt(M(p,o.seed,"seed"),n.ORDER)}function c(p,g=!0){return e.BASE.multiply(n.fromBytes(p)).toBytes(g)}function l(p){let{secretKey:g,publicKey:w,publicKeyUncompressed:m}=o;if(!Qe(p)||"_lengths"in n&&n._lengths||g===w)return;let v=M(p,void 0,"key").length;return v===w||v===m}function f(p,g,w=!0){if(l(p)===!0)throw new Error("first arg must be private key");if(l(g)===!1)throw new Error("second arg must be public key");let m=n.fromBytes(p);return e.fromBytes(g).multiply(m).toBytes(w)}let u={isValidSecretKey:s,isValidPublicKey:i,randomSecretKey:a},y=mt(a,c);return Object.freeze({getPublicKey:c,getSharedSecret:f,keygen:y,Point:e,utils:u,lengths:o})}function to(e,t,n={}){Ue(t),rt(n,{},{hmac:"function",lowS:"boolean",randomBytes:"function",bits2int:"function",bits2int_modN:"function"}),n=Object.assign({},n);let r=n.randomBytes||ue,o=n.hmac||((d,h)=>be(t,d,h)),{Fp:s,Fn:i}=e,{ORDER:a,BITS:c}=i,{keygen:l,getPublicKey:f,getSharedSecret:u,utils:y,lengths:p}=Ys(e,n),g={prehash:!0,lowS:typeof n.lowS=="boolean"?n.lowS:!0,format:"compact",extraEntropy:!1},w=a*Jr<s.ORDER;function m(d){let h=a>>ze;return d>h}function v(d,h){if(!i.isValidNot0(h))throw new Error(`invalid signature ${d}: out of range 1..Point.Fn.ORDER`);return h}function B(){if(w)throw new Error('"recovered" sig type is not supported for cofactor >2 curves')}function C(d,h){cn(h);let x=p.signature,S=h==="compact"?x:h==="recovered"?x+1:void 0;return M(d,S)}class H{constructor(h,x,S){E(this,"r");E(this,"s");E(this,"recovery");if(this.r=v("r",h),this.s=v("s",x),S!=null){if(B(),![0,1,2,3].includes(S))throw new Error("invalid recovery id");this.recovery=S}Object.freeze(this)}static fromBytes(h,x=g.format){C(h,x);let S;if(x==="der"){let{r:A,s:T}=ke.toSig(M(h));return new H(A,T)}x==="recovered"&&(S=h[0],x="compact",h=h.subarray(1));let _=p.signature/2,b=h.subarray(0,_),R=h.subarray(_,_*2);return new H(i.fromBytes(b),i.fromBytes(R),S)}static fromHex(h,x){return this.fromBytes(q(h),x)}assertRecovery(){let{recovery:h}=this;if(h==null)throw new Error("invalid recovery id: must be present");return h}addRecoveryBit(h){return new H(this.r,this.s,h)}recoverPublicKey(h){let{r:x,s:S}=this,_=this.assertRecovery(),b=_===2||_===3?x+a:x;if(!s.isValid(b))throw new Error("invalid recovery id: sig.r+curve.n != R.x");let R=s.toBytes(b),A=e.fromBytes(W(Qr((_&1)===0),R)),T=i.inv(b),U=$(M(h,void 0,"msgHash")),z=i.create(-U*T),V=i.create(S*T),O=e.BASE.multiplyUnsafe(z).add(A.multiplyUnsafe(V));if(O.is0())throw new Error("invalid recovery: point at infinify");return O.assertValidity(),O}hasHighS(){return m(this.s)}toBytes(h=g.format){if(cn(h),h==="der")return q(ke.hexFromSig(this));let{r:x,s:S}=this,_=i.toBytes(x),b=i.toBytes(S);return h==="recovered"?(B(),W(Uint8Array.of(this.assertRecovery()),_,b)):W(_,b)}toHex(h){return P(this.toBytes(h))}}let te=n.bits2int||function(h){if(h.length>8192)throw new Error("input is too large");let x=Le(h),S=h.length*8-c;return S>0?x>>BigInt(S):x},$=n.bits2int_modN||function(h){return i.create(te(h))},X=nt(c);function j(d){return Ir("num < 2^"+c,d,Ae,X),i.toBytes(d)}function N(d,h){return M(d,void 0,"message"),h?M(t(d),void 0,"prehashed message"):d}function G(d,h,x){let{lowS:S,prehash:_,extraEntropy:b}=an(x,g);d=N(d,_);let R=$(d),A=i.fromBytes(h);if(!i.isValidNot0(A))throw new Error("invalid private key");let T=[j(A),j(R)];if(b!=null&&b!==!1){let O=b===!0?r(p.secretKey):b;T.push(M(O,void 0,"extraEntropy"))}let U=W(...T),z=R;function V(O){let F=te(O);if(!i.isValidNot0(F))return;let J=i.inv(F),Q=e.BASE.multiply(F).toAffine(),Y=i.create(Q.x);if(Y===Ae)return;let ae=i.create(J*i.create(z+Y*A));if(ae===Ae)return;let wr=(Q.x===Y?0:2)|Number(Q.y&ze),br=ae;return S&&m(ae)&&(br=i.neg(ae),wr^=1),new H(Y,br,w?void 0:wr)}return{seed:U,k2sig:V}}function D(d,h,x={}){let{seed:S,k2sig:_}=G(d,h,x);return Cr(t.outputLen,i.BYTES,o)(S,_).toBytes(x.format)}function I(d,h,x,S={}){let{lowS:_,prehash:b,format:R}=an(S,g);if(x=M(x,void 0,"publicKey"),h=N(h,b),!Qe(d)){let A=d instanceof H?", use sig.toBytes()":"";throw new Error("verify expects Uint8Array signature"+A)}C(d,R);try{let A=H.fromBytes(d,R),T=e.fromBytes(x);if(_&&A.hasHighS())return!1;let{r:U,s:z}=A,V=$(h),O=i.inv(z),F=i.create(V*O),J=i.create(U*O),Q=e.BASE.multiplyUnsafe(F).add(T.multiplyUnsafe(J));return Q.is0()?!1:i.create(Q.x)===U}catch{return!1}}function k(d,h,x={}){let{prehash:S}=an(x,g);return h=N(h,S),H.fromBytes(d,"recovered").recoverPublicKey(h).toBytes()}return Object.freeze({keygen:l,getPublicKey:f,getSharedSecret:u,utils:y,lengths:p,Point:e,sign:D,verify:I,recoverPublicKey:k,Signature:H,hash:t})}var Et={p:BigInt("0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f"),n:BigInt("0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"),h:BigInt(1),a:BigInt(0),b:BigInt(7),Gx:BigInt("0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"),Gy:BigInt("0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8")},Qs={beta:BigInt("0x7ae96a2b657c07106e64479eac3434e99cf0497512f58995c1396c28719501ee"),basises:[[BigInt("0x3086d221a7d46bcde86c90e49284eb15"),-BigInt("0xe4437ed6010e88286f547fa90abfe4c3")],[BigInt("0x114ca50f7a8e2f3f657c1108d9d44cfd8"),BigInt("0x3086d221a7d46bcde86c90e49284eb15")]]},ei=BigInt(0),fn=BigInt(2);function ti(e){let t=Et.p,n=BigInt(3),r=BigInt(6),o=BigInt(11),s=BigInt(22),i=BigInt(23),a=BigInt(44),c=BigInt(88),l=e*e*e%t,f=l*l*e%t,u=he(f,n,t)*f%t,y=he(u,n,t)*f%t,p=he(y,fn,t)*l%t,g=he(p,o,t)*p%t,w=he(g,s,t)*g%t,m=he(w,a,t)*w%t,v=he(m,c,t)*m%t,B=he(v,a,t)*w%t,C=he(B,n,t)*f%t,H=he(C,i,t)*g%t,te=he(H,r,t)*l%t,$=he(te,fn,t);if(!xt.eql(xt.sqr($),e))throw new Error("Cannot find square root");return $}var xt=We(Et.p,{sqrt:ti}),He=Yr(Et,{Fp:xt,endo:Qs}),Me=to(He,ee),no={};function vt(e,...t){let n=no[e];if(n===void 0){let r=ee(kr(e));n=W(r,r),no[e]=n}return ee(W(n,...t))}var hn=e=>e.toBytes(!0).slice(1),dn=e=>e%fn===ei;function un(e){let{Fn:t,BASE:n}=He,r=t.fromBytes(e),o=n.multiply(r);return{scalar:dn(o.y)?r:t.neg(r),bytes:hn(o)}}function oo(e){let t=xt;if(!t.isValidNot0(e))throw new Error("invalid x: Fail if x \u2265 p");let n=t.create(e*e),r=t.create(n*e+BigInt(7)),o=t.sqrt(r);dn(o)||(o=t.neg(o));let s=He.fromAffine({x:e,y:o});return s.assertValidity(),s}var st=Le;function so(...e){return He.Fn.create(st(vt("BIP0340/challenge",...e)))}function ro(e){return un(e).bytes}function ni(e,t,n=ue(32)){let{Fn:r}=He,o=M(e,void 0,"message"),{bytes:s,scalar:i}=un(t),a=M(n,32,"auxRand"),c=r.toBytes(i^st(vt("BIP0340/aux",a))),l=vt("BIP0340/nonce",c,s,o),{bytes:f,scalar:u}=un(l),y=so(f,s,o),p=new Uint8Array(64);if(p.set(f,0),p.set(r.toBytes(r.create(u+y*i)),32),!io(p,o,s))throw new Error("sign: Invalid signature produced");return p}function io(e,t,n){let{Fp:r,Fn:o,BASE:s}=He,i=M(e,64,"signature"),a=M(t,void 0,"message"),c=M(n,32,"publicKey");try{let l=oo(st(c)),f=st(i.subarray(0,32));if(!r.isValidNot0(f))return!1;let u=st(i.subarray(32,64));if(!o.isValidNot0(u))return!1;let y=so(o.toBytes(f),hn(l),a),p=s.multiplyUnsafe(u).add(l.multiplyUnsafe(o.neg(y))),{x:g,y:w}=p.toAffine();return!(p.is0()||!dn(w)||g!==f)}catch{return!1}}var Ze=(()=>{let n=(r=ue(48))=>gt(r,Et.n);return{keygen:mt(n,ro),getPublicKey:ro,sign:ni,verify:io,Point:He,utils:{randomSecretKey:n,taggedHash:vt,lift_x:oo,pointToBytes:hn},lengths:{secretKey:32,publicKey:32,publicKeyHasPrefix:!1,signature:64,seed:48}}})();function mn(e){return e instanceof Uint8Array||ArrayBuffer.isView(e)&&e.constructor.name==="Uint8Array"}function ri(e){if(!mn(e))throw new Error("Uint8Array expected")}function fo(e,t){return Array.isArray(t)?t.length===0?!0:e?t.every(n=>typeof n=="string"):t.every(n=>Number.isSafeInteger(n)):!1}function oi(e){if(typeof e!="function")throw new Error("function expected");return!0}function Pe(e,t){if(typeof t!="string")throw new Error(`${e}: string expected`);return!0}function wn(e){if(!Number.isSafeInteger(e))throw new Error(`invalid integer: ${e}`)}function pn(e){if(!Array.isArray(e))throw new Error("array expected")}function At(e,t){if(!fo(!0,t))throw new Error(`${e}: array of strings expected`)}function uo(e,t){if(!fo(!1,t))throw new Error(`${e}: array of numbers expected`)}function ho(...e){let t=s=>s,n=(s,i)=>a=>s(i(a)),r=e.map(s=>s.encode).reduceRight(n,t),o=e.map(s=>s.decode).reduce(n,t);return{encode:r,decode:o}}function po(e){let t=typeof e=="string"?e.split(""):e,n=t.length;At("alphabet",t);let r=new Map(t.map((o,s)=>[o,s]));return{encode:o=>(pn(o),o.map(s=>{if(!Number.isSafeInteger(s)||s<0||s>=n)throw new Error(`alphabet.encode: digit index outside alphabet "${s}". Allowed: ${e}`);return t[s]})),decode:o=>(pn(o),o.map(s=>{Pe("alphabet.decode",s);let i=r.get(s);if(i===void 0)throw new Error(`Unknown letter: "${s}". Allowed: ${e}`);return i}))}}function go(e=""){return Pe("join",e),{encode:t=>(At("join.decode",t),t.join(e)),decode:t=>(Pe("join.decode",t),t.split(e))}}function si(e,t="="){return wn(e),Pe("padding",t),{encode(n){for(At("padding.encode",n);n.length*e%8;)n.push(t);return n},decode(n){At("padding.decode",n);let r=n.length;if(r*e%8)throw new Error("padding: invalid, string should have whole number of bytes");for(;r>0&&n[r-1]===t;r--)if((r-1)*e%8===0)throw new Error("padding: invalid, string has too much padding");return n.slice(0,r)}}}var yo=(e,t)=>t===0?e:yo(t,e%t),Bt=(e,t)=>e+(t-yo(e,t)),St=(()=>{let e=[];for(let t=0;t<40;t++)e.push(2**t);return e})();function gn(e,t,n,r){if(pn(e),t<=0||t>32)throw new Error(`convertRadix2: wrong from=${t}`);if(n<=0||n>32)throw new Error(`convertRadix2: wrong to=${n}`);if(Bt(t,n)>32)throw new Error(`convertRadix2: carry overflow from=${t} to=${n} carryBits=${Bt(t,n)}`);let o=0,s=0,i=St[t],a=St[n]-1,c=[];for(let l of e){if(wn(l),l>=i)throw new Error(`convertRadix2: invalid data word=${l} from=${t}`);if(o=o<<t|l,s+t>32)throw new Error(`convertRadix2: carry overflow pos=${s} from=${t}`);for(s+=t;s>=n;s-=n)c.push((o>>s-n&a)>>>0);let f=St[s];if(f===void 0)throw new Error("invalid carry");o&=f-1}if(o=o<<n-s&a,!r&&s>=t)throw new Error("Excess padding");if(!r&&o>0)throw new Error(`Non-zero padding: ${o}`);return r&&s>0&&c.push(o>>>0),c}function mo(e,t=!1){if(wn(e),e<=0||e>32)throw new Error("radix2: bits should be in (0..32]");if(Bt(8,e)>32||Bt(e,8)>32)throw new Error("radix2: carry overflow");return{encode:n=>{if(!mn(n))throw new Error("radix2.encode input should be Uint8Array");return gn(Array.from(n),8,e,!t)},decode:n=>(uo("radix2.decode",n),Uint8Array.from(gn(n,e,8,t)))}}function ao(e){return oi(e),function(...t){try{return e.apply(null,t)}catch{}}}var ii=typeof Uint8Array.from([]).toBase64=="function"&&typeof Uint8Array.fromBase64=="function",ai=(e,t)=>{Pe("base64",e);let n=t?/^[A-Za-z0-9=_-]+$/:/^[A-Za-z0-9=+/]+$/,r=t?"base64url":"base64";if(e.length>0&&!n.test(e))throw new Error("invalid base64");return Uint8Array.fromBase64(e,{alphabet:r,lastChunkHandling:"strict"})},le=ii?{encode(e){return ri(e),e.toBase64()},decode(e){return ai(e,!1)}}:ho(mo(6),po("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"),si(6),go(""));var yn=ho(po("qpzry9x8gf2tvdw0s3jn54khce6mua7l"),go("")),co=[996825010,642813549,513874426,1027748829,705979059];function it(e){let t=e>>25,n=(e&33554431)<<5;for(let r=0;r<co.length;r++)(t>>r&1)===1&&(n^=co[r]);return n}function lo(e,t,n=1){let r=e.length,o=1;for(let s=0;s<r;s++){let i=e.charCodeAt(s);if(i<33||i>126)throw new Error(`Invalid prefix (${e})`);o=it(o)^i>>5}o=it(o);for(let s=0;s<r;s++)o=it(o)^e.charCodeAt(s)&31;for(let s of t)o=it(o)^s;for(let s=0;s<6;s++)o=it(o);return o^=n,yn.encode(gn([o%St[30]],30,5,!1))}function ci(e){let t=e==="bech32"?1:734539939,n=mo(5),r=n.decode,o=n.encode,s=ao(r);function i(u,y,p=90){Pe("bech32.encode prefix",u),mn(y)&&(y=Array.from(y)),uo("bech32.encode",y);let g=u.length;if(g===0)throw new TypeError(`Invalid prefix length ${g}`);let w=g+7+y.length;if(p!==!1&&w>p)throw new TypeError(`Length ${w} exceeds limit ${p}`);let m=u.toLowerCase(),v=lo(m,y,t);return`${m}1${yn.encode(y)}${v}`}function a(u,y=90){Pe("bech32.decode input",u);let p=u.length;if(p<8||y!==!1&&p>y)throw new TypeError(`invalid string length: ${p} (${u}). Expected (8..${y})`);let g=u.toLowerCase();if(u!==g&&u!==u.toUpperCase())throw new Error("String must be lowercase or uppercase");let w=g.lastIndexOf("1");if(w===0||w===-1)throw new Error('Letter "1" must be present between prefix and data only');let m=g.slice(0,w),v=g.slice(w+1);if(v.length<6)throw new Error("Data must be at least 6 characters long");let B=yn.decode(v).slice(0,-6),C=lo(m,B,t);if(!v.endsWith(C))throw new Error(`Invalid checksum in ${u}: expected "${C}"`);return{prefix:m,words:B}}let c=ao(a);function l(u){let{prefix:y,words:p}=a(u,!1);return{prefix:y,words:p,bytes:r(p)}}function f(u,y){return i(u,o(y))}return{encode:i,decode:a,encodeFromBytes:f,decodeToBytes:l,decodeUnsafe:c,fromWords:r,fromWordsUnsafe:s,toWords:o}}var Ie=ci("bech32");function li(e){return e instanceof Uint8Array||ArrayBuffer.isView(e)&&e.constructor.name==="Uint8Array"}function _t(e){if(typeof e!="boolean")throw new Error(`boolean expected, not ${e}`)}function at(e){if(!Number.isSafeInteger(e)||e<0)throw new Error("positive integer expected, got "+e)}function Z(e,t,n=""){let r=li(e),o=e?.length,s=t!==void 0;if(!r||s&&o!==t){let i=n&&`"${n}" `,a=s?` of length ${t}`:"",c=r?`length=${o}`:`type=${typeof e}`;throw new Error(i+"expected Uint8Array"+a+", got "+c)}return e}function bn(e,t=!0){if(e.destroyed)throw new Error("Hash instance has been destroyed");if(t&&e.finished)throw new Error("Hash#digest() has already been called")}function wo(e,t){Z(e,void 0,"output");let n=t.outputLen;if(e.length<n)throw new Error("digestInto() expects output buffer of length at least "+n)}function ne(e){return new Uint32Array(e.buffer,e.byteOffset,Math.floor(e.byteLength/4))}function oe(...e){for(let t=0;t<e.length;t++)e[t].fill(0)}function bo(e){return new DataView(e.buffer,e.byteOffset,e.byteLength)}var fi=new Uint8Array(new Uint32Array([287454020]).buffer)[0]===68;function xo(e,t){return e.buffer===t.buffer&&e.byteOffset<t.byteOffset+t.byteLength&&t.byteOffset<e.byteOffset+e.byteLength}function xn(e,t){if(xo(e,t)&&e.byteOffset<t.byteOffset)throw new Error("complex overlap of input and output is not supported")}function vo(e,t){if(t==null||typeof t!="object")throw new Error("options must be defined");return Object.assign(e,t)}function qe(e,t){if(e.length!==t.length)return!1;let n=0;for(let r=0;r<e.length;r++)n|=e[r]^t[r];return n===0}var ct=(e,t)=>{function n(r,...o){if(Z(r,void 0,"key"),!fi)throw new Error("Non little-endian hardware is not yet supported");if(e.nonceLength!==void 0){let f=o[0];Z(f,e.varSizeNonce?void 0:e.nonceLength,"nonce")}let s=e.tagLength;s&&o[1]!==void 0&&Z(o[1],void 0,"AAD");let i=t(r,...o),a=(f,u)=>{if(u!==void 0){if(f!==2)throw new Error("cipher output not supported");Z(u,void 0,"output")}},c=!1;return{encrypt(f,u){if(c)throw new Error("cannot encrypt() twice with same key + nonce");return c=!0,Z(f),a(i.encrypt.length,u),i.encrypt(f,u)},decrypt(f,u){if(Z(f),s&&f.length<s)throw new Error('"ciphertext" expected length bigger than tagLength='+s);return a(i.decrypt.length,u),i.decrypt(f,u)}}}return Object.assign(n,e),n};function je(e,t,n=!0){if(t===void 0)return new Uint8Array(e);if(t.length!==e)throw new Error('"output" expected Uint8Array of length '+e+", got: "+t.length);if(n&&!De(t))throw new Error("invalid output, must be aligned");return t}function vn(e,t,n){_t(n);let r=new Uint8Array(16),o=bo(r);return o.setBigUint64(0,BigInt(t),n),o.setBigUint64(8,BigInt(e),n),r}function De(e){return e.byteOffset%4===0}function pe(e){return Uint8Array.from(e)}var re=16;var hi=283;function So(e){if(![16,24,32].includes(e.length))throw new Error('"aes key" expected Uint8Array of length 16/24/32, got length='+e.length)}function _n(e){return e<<1^hi&-(e>>7)}function Fe(e,t){let n=0;for(;t>0;t>>=1)n^=e&-(t&1),e=_n(e);return n}var An=(()=>{let e=new Uint8Array(256);for(let n=0,r=1;n<256;n++,r^=_n(r))e[n]=r;let t=new Uint8Array(256);t[0]=99;for(let n=0;n<255;n++){let r=e[255-n];r|=r<<8,t[e[n]]=(r^r>>4^r>>5^r>>6^r>>7^99)&255}return oe(e),t})(),di=An.map((e,t)=>An.indexOf(t)),pi=e=>e<<24|e>>>8,En=e=>e<<8|e>>>24;function Ao(e,t){if(e.length!==256)throw new Error("Wrong sbox length");let n=new Uint32Array(256).map((l,f)=>t(e[f])),r=n.map(En),o=r.map(En),s=o.map(En),i=new Uint32Array(256*256),a=new Uint32Array(256*256),c=new Uint16Array(256*256);for(let l=0;l<256;l++)for(let f=0;f<256;f++){let u=l*256+f;i[u]=n[l]^r[f],a[u]=o[l]^s[f],c[u]=e[l]<<8|e[f]}return{sbox:e,sbox2:c,T0:n,T1:r,T2:o,T3:s,T01:i,T23:a}}var Rn=Ao(An,e=>Fe(e,3)<<24|e<<16|e<<8|Fe(e,2)),Bo=Ao(di,e=>Fe(e,11)<<24|Fe(e,13)<<16|Fe(e,9)<<8|Fe(e,14)),gi=(()=>{let e=new Uint8Array(16);for(let t=0,n=1;t<16;t++,n=_n(n))e[t]=n;return e})();function Tn(e){Z(e);let t=e.length;So(e);let{sbox2:n}=Rn,r=[];De(e)||r.push(e=pe(e));let o=ne(e),s=o.length,i=c=>xe(n,c,c,c,c),a=new Uint32Array(t+28);a.set(o);for(let c=s;c<a.length;c++){let l=a[c-1];c%s===0?l=i(pi(l))^gi[c/s-1]:s>6&&c%s===4&&(l=i(l)),a[c]=a[c-s]^l}return oe(...r),a}function yi(e){let t=Tn(e),n=t.slice(),r=t.length,{sbox2:o}=Rn,{T0:s,T1:i,T2:a,T3:c}=Bo;for(let l=0;l<r;l+=4)for(let f=0;f<4;f++)n[l+f]=t[r-l-4+f];oe(t);for(let l=4;l<r-4;l++){let f=n[l],u=xe(o,f,f,f,f);n[l]=s[u&255]^i[u>>>8&255]^a[u>>>16&255]^c[u>>>24]}return n}function Ce(e,t,n,r,o,s){return e[n<<8&65280|r>>>8&255]^t[o>>>8&65280|s>>>24&255]}function xe(e,t,n,r,o){return e[t&255|n&65280]|e[r>>>16&255|o>>>16&65280]<<16}function Bn(e,t,n,r,o){let{sbox2:s,T01:i,T23:a}=Rn,c=0;t^=e[c++],n^=e[c++],r^=e[c++],o^=e[c++];let l=e.length/4-2;for(let g=0;g<l;g++){let w=e[c++]^Ce(i,a,t,n,r,o),m=e[c++]^Ce(i,a,n,r,o,t),v=e[c++]^Ce(i,a,r,o,t,n),B=e[c++]^Ce(i,a,o,t,n,r);t=w,n=m,r=v,o=B}let f=e[c++]^xe(s,t,n,r,o),u=e[c++]^xe(s,n,r,o,t),y=e[c++]^xe(s,r,o,t,n),p=e[c++]^xe(s,o,t,n,r);return{s0:f,s1:u,s2:y,s3:p}}function mi(e,t,n,r,o){let{sbox2:s,T01:i,T23:a}=Bo,c=0;t^=e[c++],n^=e[c++],r^=e[c++],o^=e[c++];let l=e.length/4-2;for(let g=0;g<l;g++){let w=e[c++]^Ce(i,a,t,o,r,n),m=e[c++]^Ce(i,a,n,t,o,r),v=e[c++]^Ce(i,a,r,n,t,o),B=e[c++]^Ce(i,a,o,r,n,t);t=w,n=m,r=v,o=B}let f=e[c++]^xe(s,t,o,r,n),u=e[c++]^xe(s,n,t,o,r),y=e[c++]^xe(s,r,n,t,o),p=e[c++]^xe(s,o,r,n,t);return{s0:f,s1:u,s2:y,s3:p}}function wi(e){if(Z(e),e.length%re!==0)throw new Error("aes-(cbc/ecb).decrypt ciphertext should consist of blocks with size "+re)}function bi(e,t,n){Z(e);let r=e.length,o=r%re;if(!t&&o!==0)throw new Error("aec/(cbc-ecb): unpadded plaintext with disabled padding");De(e)||(e=pe(e));let s=ne(e);if(t){let a=re-o;a||(a=re),r=r+a}n=je(r,n),xn(e,n);let i=ne(n);return{b:s,o:i,out:n}}function xi(e,t){if(!t)return e;let n=e.length;if(!n)throw new Error("aes/pcks5: empty ciphertext not allowed");let r=e[n-1];if(r<=0||r>16)throw new Error("aes/pcks5: wrong padding");let o=e.subarray(0,-r);for(let s=0;s<r;s++)if(e[n-s-1]!==r)throw new Error("aes/pcks5: wrong padding");return o}function vi(e){let t=new Uint8Array(16),n=ne(t);t.set(e);let r=re-e.length;for(let o=re-r;o<re;o++)t[o]=r;return n}var Ln=ct({blockSize:16,nonceLength:16},function(t,n,r={}){let o=!r.disablePadding;return{encrypt(s,i){let a=Tn(t),{b:c,o:l,out:f}=bi(s,o,i),u=n,y=[a];De(u)||y.push(u=pe(u));let p=ne(u),g=p[0],w=p[1],m=p[2],v=p[3],B=0;for(;B+4<=c.length;)g^=c[B+0],w^=c[B+1],m^=c[B+2],v^=c[B+3],{s0:g,s1:w,s2:m,s3:v}=Bn(a,g,w,m,v),l[B++]=g,l[B++]=w,l[B++]=m,l[B++]=v;if(o){let C=vi(s.subarray(B*4));g^=C[0],w^=C[1],m^=C[2],v^=C[3],{s0:g,s1:w,s2:m,s3:v}=Bn(a,g,w,m,v),l[B++]=g,l[B++]=w,l[B++]=m,l[B++]=v}return oe(...y),f},decrypt(s,i){wi(s);let a=yi(t),c=n,l=[a];De(c)||l.push(c=pe(c));let f=ne(c);i=je(s.length,i),De(s)||l.push(s=pe(s)),xn(s,i);let u=ne(s),y=ne(i),p=f[0],g=f[1],w=f[2],m=f[3];for(let v=0;v+4<=u.length;){let B=p,C=g,H=w,te=m;p=u[v+0],g=u[v+1],w=u[v+2],m=u[v+3];let{s0:$,s1:X,s2:j,s3:N}=mi(a,p,g,w,m);y[v++]=$^B,y[v++]=X^C,y[v++]=j^H,y[v++]=N^te}return oe(...l),xi(i,o)}}});function Ei(e){return e instanceof Uint32Array||ArrayBuffer.isView(e)&&e.constructor.name==="Uint32Array"}function Sn(e,t){if(Z(t,16,"block"),!Ei(e))throw new Error("_encryptBlock accepts result of expandKeyLE");let n=ne(t),{s0:r,s1:o,s2:s,s3:i}=Bn(e,n[0],n[1],n[2],n[3]);return n[0]=r,n[1]=o,n[2]=s,n[3]=i,t}function Eo(e){let t=0;for(let n=re-1;n>=0;n--){let r=(e[n]&128)>>>7;e[n]=e[n]<<1|t,t=r}return t&&(e[re-1]^=135),e}function Rt(e,t){if(e.length!==t.length)throw new Error("xorBlock: blocks must have same length");for(let n=0;n<e.length;n++)e[n]=e[n]^t[n];return e}var Tt=class{constructor(t){E(this,"buffer");E(this,"destroyed");E(this,"k1");E(this,"k2");E(this,"xk");Z(t),So(t),this.xk=Tn(t),this.buffer=new Uint8Array(0),this.destroyed=!1;let n=new Uint8Array(re);Sn(this.xk,n),this.k1=Eo(n),this.k2=Eo(new Uint8Array(this.k1))}update(t){let{destroyed:n,buffer:r}=this;if(n)throw new Error("CMAC instance was destroyed");Z(t);let o=new Uint8Array(r.length+t.length);return o.set(r),o.set(t,r.length),this.buffer=o,this}digest(){if(this.destroyed)throw new Error("CMAC instance was destroyed");let{buffer:t}=this,n=t.length,r=Math.ceil(n/re),o;r===0?(r=1,o=!1):o=n%re===0;let s=(r-1)*re,i=t.subarray(s),a;if(o)a=Rt(new Uint8Array(i),this.k1);else{let l=new Uint8Array(re);l.set(i),l[i.length]=128,a=Rt(l,this.k2)}let c=new Uint8Array(re);for(let l=0;l<r-1;l++){let f=t.subarray(l*re,(l+1)*re);Rt(c,f),Sn(this.xk,c)}return Rt(c,a),Sn(this.xk,c),oe(a),c}destroy(){let{buffer:t,destroyed:n,xk:r,k1:o,k2:s}=this;n||(this.destroyed=!0,oe(t,r,o,s))}},Si=(e,t)=>new Tt(e).update(t).digest();Si.create=e=>new Tt(e);var Ro=e=>Uint8Array.from(e.split(""),t=>t.charCodeAt(0)),Ai=Ro("expand 16-byte k"),Bi=Ro("expand 32-byte k"),_i=ne(Ai),Ri=ne(Bi);function L(e,t){return e<<t|e>>>32-t}function kn(e){return e.byteOffset%4===0}var Lt=64,Ti=16,To=2**32-1,_o=Uint32Array.of();function Li(e,t,n,r,o,s,i,a){let c=o.length,l=new Uint8Array(Lt),f=ne(l),u=kn(o)&&kn(s),y=u?ne(o):_o,p=u?ne(s):_o;for(let g=0;g<c;i++){if(e(t,n,r,f,i,a),i>=To)throw new Error("arx: counter overflow");let w=Math.min(Lt,c-g);if(u&&w===Lt){let m=g/4;if(g%4!==0)throw new Error("arx: invalid block position");for(let v=0,B;v<Ti;v++)B=m+v,p[B]=y[B]^f[v];g+=Lt;continue}for(let m=0,v;m<w;m++)v=g+m,s[v]=o[v]^l[m];g+=w}}function In(e,t){let{allowShortKeys:n,extendNonceFn:r,counterLength:o,counterRight:s,rounds:i}=vo({allowShortKeys:!1,counterLength:8,counterRight:!1,rounds:20},t);if(typeof e!="function")throw new Error("core must be a function");return at(o),at(i),_t(s),_t(n),(a,c,l,f,u=0)=>{Z(a,void 0,"key"),Z(c,void 0,"nonce"),Z(l,void 0,"data");let y=l.length;if(f===void 0&&(f=new Uint8Array(y)),Z(f,void 0,"output"),at(u),u<0||u>=To)throw new Error("arx: counter overflow");if(f.length<y)throw new Error(`arx: output (${f.length}) is shorter than data (${y})`);let p=[],g=a.length,w,m;if(g===32)p.push(w=pe(a)),m=Ri;else if(g===16&&n)w=new Uint8Array(32),w.set(a),w.set(a,16),m=_i,p.push(w);else throw Z(a,32,"arx key"),new Error("invalid key size");kn(c)||p.push(c=pe(c));let v=ne(w);if(r){if(c.length!==24)throw new Error("arx: extended nonce must be 24 bytes");r(m,v,ne(c.subarray(0,16)),v),c=c.subarray(16)}let B=16-o;if(B!==c.length)throw new Error(`arx: nonce must be ${B} or 16 bytes`);if(B!==12){let H=new Uint8Array(12);H.set(c,s?0:12-c.length),c=H,p.push(c)}let C=ne(c);return Li(e,m,v,C,l,f,u,i),oe(...p),f}}function se(e,t){return e[t++]&255|(e[t++]&255)<<8}var Cn=class{constructor(t){E(this,"blockLen",16);E(this,"outputLen",16);E(this,"buffer",new Uint8Array(16));E(this,"r",new Uint16Array(10));E(this,"h",new Uint16Array(10));E(this,"pad",new Uint16Array(8));E(this,"pos",0);E(this,"finished",!1);t=pe(Z(t,32,"key"));let n=se(t,0),r=se(t,2),o=se(t,4),s=se(t,6),i=se(t,8),a=se(t,10),c=se(t,12),l=se(t,14);this.r[0]=n&8191,this.r[1]=(n>>>13|r<<3)&8191,this.r[2]=(r>>>10|o<<6)&7939,this.r[3]=(o>>>7|s<<9)&8191,this.r[4]=(s>>>4|i<<12)&255,this.r[5]=i>>>1&8190,this.r[6]=(i>>>14|a<<2)&8191,this.r[7]=(a>>>11|c<<5)&8065,this.r[8]=(c>>>8|l<<8)&8191,this.r[9]=l>>>5&127;for(let f=0;f<8;f++)this.pad[f]=se(t,16+2*f)}process(t,n,r=!1){let o=r?0:2048,{h:s,r:i}=this,a=i[0],c=i[1],l=i[2],f=i[3],u=i[4],y=i[5],p=i[6],g=i[7],w=i[8],m=i[9],v=se(t,n+0),B=se(t,n+2),C=se(t,n+4),H=se(t,n+6),te=se(t,n+8),$=se(t,n+10),X=se(t,n+12),j=se(t,n+14),N=s[0]+(v&8191),G=s[1]+((v>>>13|B<<3)&8191),D=s[2]+((B>>>10|C<<6)&8191),I=s[3]+((C>>>7|H<<9)&8191),k=s[4]+((H>>>4|te<<12)&8191),d=s[5]+(te>>>1&8191),h=s[6]+((te>>>14|$<<2)&8191),x=s[7]+(($>>>11|X<<5)&8191),S=s[8]+((X>>>8|j<<8)&8191),_=s[9]+(j>>>5|o),b=0,R=b+N*a+G*(5*m)+D*(5*w)+I*(5*g)+k*(5*p);b=R>>>13,R&=8191,R+=d*(5*y)+h*(5*u)+x*(5*f)+S*(5*l)+_*(5*c),b+=R>>>13,R&=8191;let A=b+N*c+G*a+D*(5*m)+I*(5*w)+k*(5*g);b=A>>>13,A&=8191,A+=d*(5*p)+h*(5*y)+x*(5*u)+S*(5*f)+_*(5*l),b+=A>>>13,A&=8191;let T=b+N*l+G*c+D*a+I*(5*m)+k*(5*w);b=T>>>13,T&=8191,T+=d*(5*g)+h*(5*p)+x*(5*y)+S*(5*u)+_*(5*f),b+=T>>>13,T&=8191;let U=b+N*f+G*l+D*c+I*a+k*(5*m);b=U>>>13,U&=8191,U+=d*(5*w)+h*(5*g)+x*(5*p)+S*(5*y)+_*(5*u),b+=U>>>13,U&=8191;let z=b+N*u+G*f+D*l+I*c+k*a;b=z>>>13,z&=8191,z+=d*(5*m)+h*(5*w)+x*(5*g)+S*(5*p)+_*(5*y),b+=z>>>13,z&=8191;let V=b+N*y+G*u+D*f+I*l+k*c;b=V>>>13,V&=8191,V+=d*a+h*(5*m)+x*(5*w)+S*(5*g)+_*(5*p),b+=V>>>13,V&=8191;let O=b+N*p+G*y+D*u+I*f+k*l;b=O>>>13,O&=8191,O+=d*c+h*a+x*(5*m)+S*(5*w)+_*(5*g),b+=O>>>13,O&=8191;let F=b+N*g+G*p+D*y+I*u+k*f;b=F>>>13,F&=8191,F+=d*l+h*c+x*a+S*(5*m)+_*(5*w),b+=F>>>13,F&=8191;let J=b+N*w+G*g+D*p+I*y+k*u;b=J>>>13,J&=8191,J+=d*f+h*l+x*c+S*a+_*(5*m),b+=J>>>13,J&=8191;let Q=b+N*m+G*w+D*g+I*p+k*y;b=Q>>>13,Q&=8191,Q+=d*u+h*f+x*l+S*c+_*a,b+=Q>>>13,Q&=8191,b=(b<<2)+b|0,b=b+R|0,R=b&8191,b=b>>>13,A+=b,s[0]=R,s[1]=A,s[2]=T,s[3]=U,s[4]=z,s[5]=V,s[6]=O,s[7]=F,s[8]=J,s[9]=Q}finalize(){let{h:t,pad:n}=this,r=new Uint16Array(10),o=t[1]>>>13;t[1]&=8191;for(let a=2;a<10;a++)t[a]+=o,o=t[a]>>>13,t[a]&=8191;t[0]+=o*5,o=t[0]>>>13,t[0]&=8191,t[1]+=o,o=t[1]>>>13,t[1]&=8191,t[2]+=o,r[0]=t[0]+5,o=r[0]>>>13,r[0]&=8191;for(let a=1;a<10;a++)r[a]=t[a]+o,o=r[a]>>>13,r[a]&=8191;r[9]-=8192;let s=(o^1)-1;for(let a=0;a<10;a++)r[a]&=s;s=~s;for(let a=0;a<10;a++)t[a]=t[a]&s|r[a];t[0]=(t[0]|t[1]<<13)&65535,t[1]=(t[1]>>>3|t[2]<<10)&65535,t[2]=(t[2]>>>6|t[3]<<7)&65535,t[3]=(t[3]>>>9|t[4]<<4)&65535,t[4]=(t[4]>>>12|t[5]<<1|t[6]<<14)&65535,t[5]=(t[6]>>>2|t[7]<<11)&65535,t[6]=(t[7]>>>5|t[8]<<8)&65535,t[7]=(t[8]>>>8|t[9]<<5)&65535;let i=t[0]+n[0];t[0]=i&65535;for(let a=1;a<8;a++)i=(t[a]+n[a]|0)+(i>>>16)|0,t[a]=i&65535;oe(r)}update(t){bn(this),Z(t),t=pe(t);let{buffer:n,blockLen:r}=this,o=t.length;for(let s=0;s<o;){let i=Math.min(r-this.pos,o-s);if(i===r){for(;r<=o-s;s+=r)this.process(t,s);continue}n.set(t.subarray(s,s+i),this.pos),this.pos+=i,s+=i,this.pos===r&&(this.process(n,0,!1),this.pos=0)}return this}destroy(){oe(this.h,this.r,this.buffer,this.pad)}digestInto(t){bn(this),wo(t,this),this.finished=!0;let{buffer:n,h:r}=this,{pos:o}=this;if(o){for(n[o++]=1;o<16;o++)n[o]=0;this.process(n,0,!0)}this.finalize();let s=0;for(let i=0;i<8;i++)t[s++]=r[i]>>>0,t[s++]=r[i]>>>8;return t}digest(){let{buffer:t,outputLen:n}=this;this.digestInto(t);let r=t.slice(0,n);return this.destroy(),r}};function ki(e){let t=(r,o)=>e(o).update(r).digest(),n=e(new Uint8Array(32));return t.outputLen=n.outputLen,t.blockLen=n.blockLen,t.create=r=>e(r),t}var Lo=ki(e=>new Cn(e));function Co(e,t,n,r,o,s=20){let i=e[0],a=e[1],c=e[2],l=e[3],f=t[0],u=t[1],y=t[2],p=t[3],g=t[4],w=t[5],m=t[6],v=t[7],B=o,C=n[0],H=n[1],te=n[2],$=i,X=a,j=c,N=l,G=f,D=u,I=y,k=p,d=g,h=w,x=m,S=v,_=B,b=C,R=H,A=te;for(let U=0;U<s;U+=2)$=$+G|0,_=L(_^$,16),d=d+_|0,G=L(G^d,12),$=$+G|0,_=L(_^$,8),d=d+_|0,G=L(G^d,7),X=X+D|0,b=L(b^X,16),h=h+b|0,D=L(D^h,12),X=X+D|0,b=L(b^X,8),h=h+b|0,D=L(D^h,7),j=j+I|0,R=L(R^j,16),x=x+R|0,I=L(I^x,12),j=j+I|0,R=L(R^j,8),x=x+R|0,I=L(I^x,7),N=N+k|0,A=L(A^N,16),S=S+A|0,k=L(k^S,12),N=N+k|0,A=L(A^N,8),S=S+A|0,k=L(k^S,7),$=$+D|0,A=L(A^$,16),x=x+A|0,D=L(D^x,12),$=$+D|0,A=L(A^$,8),x=x+A|0,D=L(D^x,7),X=X+I|0,_=L(_^X,16),S=S+_|0,I=L(I^S,12),X=X+I|0,_=L(_^X,8),S=S+_|0,I=L(I^S,7),j=j+k|0,b=L(b^j,16),d=d+b|0,k=L(k^d,12),j=j+k|0,b=L(b^j,8),d=d+b|0,k=L(k^d,7),N=N+G|0,R=L(R^N,16),h=h+R|0,G=L(G^h,12),N=N+G|0,R=L(R^N,8),h=h+R|0,G=L(G^h,7);let T=0;r[T++]=i+$|0,r[T++]=a+X|0,r[T++]=c+j|0,r[T++]=l+N|0,r[T++]=f+G|0,r[T++]=u+D|0,r[T++]=y+I|0,r[T++]=p+k|0,r[T++]=g+d|0,r[T++]=w+h|0,r[T++]=m+x|0,r[T++]=v+S|0,r[T++]=B+_|0,r[T++]=C+b|0,r[T++]=H+R|0,r[T++]=te+A|0}function Ii(e,t,n,r){let o=e[0],s=e[1],i=e[2],a=e[3],c=t[0],l=t[1],f=t[2],u=t[3],y=t[4],p=t[5],g=t[6],w=t[7],m=n[0],v=n[1],B=n[2],C=n[3];for(let te=0;te<20;te+=2)o=o+c|0,m=L(m^o,16),y=y+m|0,c=L(c^y,12),o=o+c|0,m=L(m^o,8),y=y+m|0,c=L(c^y,7),s=s+l|0,v=L(v^s,16),p=p+v|0,l=L(l^p,12),s=s+l|0,v=L(v^s,8),p=p+v|0,l=L(l^p,7),i=i+f|0,B=L(B^i,16),g=g+B|0,f=L(f^g,12),i=i+f|0,B=L(B^i,8),g=g+B|0,f=L(f^g,7),a=a+u|0,C=L(C^a,16),w=w+C|0,u=L(u^w,12),a=a+u|0,C=L(C^a,8),w=w+C|0,u=L(u^w,7),o=o+l|0,C=L(C^o,16),g=g+C|0,l=L(l^g,12),o=o+l|0,C=L(C^o,8),g=g+C|0,l=L(l^g,7),s=s+f|0,m=L(m^s,16),w=w+m|0,f=L(f^w,12),s=s+f|0,m=L(m^s,8),w=w+m|0,f=L(f^w,7),i=i+u|0,v=L(v^i,16),y=y+v|0,u=L(u^y,12),i=i+u|0,v=L(v^i,8),y=y+v|0,u=L(u^y,7),a=a+c|0,B=L(B^a,16),p=p+B|0,c=L(c^p,12),a=a+c|0,B=L(B^a,8),p=p+B|0,c=L(c^p,7);let H=0;r[H++]=o,r[H++]=s,r[H++]=i,r[H++]=a,r[H++]=m,r[H++]=v,r[H++]=B,r[H++]=C}var Ve=In(Co,{counterRight:!1,counterLength:4,allowShortKeys:!1}),Ci=In(Co,{counterRight:!1,counterLength:8,extendNonceFn:Ii,allowShortKeys:!1});var Ui=new Uint8Array(16),ko=(e,t)=>{e.update(t);let n=t.length%16;n&&e.update(Ui.subarray(n))},Oi=new Uint8Array(32);function Io(e,t,n,r,o){o!==void 0&&Z(o,void 0,"AAD");let s=e(t,n,Oi),i=vn(r.length,o?o.length:0,!0),a=Lo.create(s);o&&ko(a,o),ko(a,r),a.update(i);let c=a.digest();return oe(s,i),c}var Uo=e=>(t,n,r)=>({encrypt(s,i){let a=s.length;i=je(a+16,i,!1),i.set(s);let c=i.subarray(0,-16);e(t,n,c,c,1);let l=Io(e,t,n,c,r);return i.set(l,a),oe(l),i},decrypt(s,i){i=je(s.length-16,i,!1);let a=s.subarray(0,-16),c=s.subarray(-16),l=Io(e,t,n,a,r);if(!qe(c,l))throw new Error("invalid tag");return i.set(s.subarray(0,-16)),e(t,n,i,i,1),oe(l),i}}),sd=ct({blockSize:64,nonceLength:12,tagLength:16},Uo(Ve)),id=ct({blockSize:64,nonceLength:24,tagLength:16},Uo(Ci));function kt(e,t,n){return Ue(e),n===void 0&&(n=new Uint8Array(e.outputLen)),be(e,n,t)}var Un=Uint8Array.of(0),Oo=Uint8Array.of();function It(e,t,n,r=32){Ue(e),de(r,"length");let o=e.outputLen;if(r>255*o)throw new Error("Length must be <= 255*HashLen");let s=Math.ceil(r/o);n===void 0?n=Oo:M(n,void 0,"info");let i=new Uint8Array(s*o),a=be.create(e,t),c=a._cloneInto(),l=new Uint8Array(a.outputLen);for(let f=0;f<s;f++)Un[0]=f+1,c.update(f===0?Oo:l).update(n).update(Un).digestInto(l),i.set(l,o*f),a._cloneInto(c);return a.destroy(),c.destroy(),Ee(l,Un),i.slice(0,r)}var Ni=Object.defineProperty,K=(e,t)=>{for(var n in t)Ni(e,n,{get:t[n],enumerable:!0})},Hi={};K(Hi,{binarySearch:()=>qn,bytesToHex:()=>P,hexToBytes:()=>q,insertEventIntoAscendingList:()=>qi,insertEventIntoDescendingList:()=>Pi,isHex32:()=>fe,mergeReverseSortedLists:()=>Vi,mergeSortedLists:()=>Di,normalizeURL:()=>Mi,utf8Decoder:()=>Re,utf8Encoder:()=>ge});var Re=new TextDecoder("utf-8"),ge=new TextEncoder;function Mi(e){try{e.indexOf("://")===-1&&(e="wss://"+e);let t=new URL(e);return t.protocol==="http:"?t.protocol="ws:":t.protocol==="https:"&&(t.protocol="wss:"),t.pathname=t.pathname.replace(/\/+/g,"/"),t.pathname.endsWith("/")&&(t.pathname=t.pathname.slice(0,-1)),(t.port==="80"&&t.protocol==="ws:"||t.port==="443"&&t.protocol==="wss:")&&(t.port=""),t.searchParams.sort(),t.hash="",t.toString()}catch{throw new Error(`Invalid URL: ${e}`)}}function Pi(e,t){let[n,r]=qn(e,o=>t.id===o.id?0:t.created_at===o.created_at?-1:o.created_at-t.created_at);return r||e.splice(n,0,t),e}function qi(e,t){let[n,r]=qn(e,o=>t.id===o.id?0:t.created_at===o.created_at?-1:t.created_at-o.created_at);return r||e.splice(n,0,t),e}function qn(e,t){let n=0,r=e.length-1;for(;n<=r;){let o=Math.floor((n+r)/2),s=t(e[o]);if(s===0)return[o,!0];s<0?r=o-1:n=o+1}return[n,!1]}function Di(e,t){let n=new Array(e.length+t.length);n.length=0;let r=0,o=0,s=[];for(;r<e.length&&o<t.length;){let i;if(e[r].created_at<t[o].created_at?(i=e[r],r++):(i=t[o],o++),n.length>0&&n[n.length-1].created_at===i.created_at){if(s.includes(i.id))continue}else s.length=0;n.push(i),s.push(i.id)}for(;r<e.length;){let i=e[r];if(r++,n.length>0&&n[n.length-1].created_at===i.created_at){if(s.includes(i.id))continue}else s.length=0;n.push(i),s.push(i.id)}for(;o<t.length;){let i=t[o];if(o++,n.length>0&&n[n.length-1].created_at===i.created_at){if(s.includes(i.id))continue}else s.length=0;n.push(i),s.push(i.id)}return n}function Vi(e,t){let n=new Array(e.length+t.length);n.length=0;let r=0,o=0,s=[];for(;r<e.length&&o<t.length;){let i;if(e[r].created_at>t[o].created_at?(i=e[r],r++):(i=t[o],o++),n.length>0&&n[n.length-1].created_at===i.created_at){if(s.includes(i.id))continue}else s.length=0;n.push(i),s.push(i.id)}for(;r<e.length;){let i=e[r];if(r++,n.length>0&&n[n.length-1].created_at===i.created_at){if(s.includes(i.id))continue}else s.length=0;n.push(i),s.push(i.id)}for(;o<t.length;){let i=t[o];if(o++,n.length>0&&n[n.length-1].created_at===i.created_at){if(s.includes(i.id))continue}else s.length=0;n.push(i),s.push(i.id)}return n}function fe(e){if(e.length!==64)return!1;for(let t=0;t<64;t++){let n=e.charCodeAt(t);if(isNaN(n)||n<48||n>102||n>57&&n<97)return!1}return!0}var Xe=Symbol("verified"),Gi=e=>e instanceof Object;function Dn(e){if(!Gi(e)||typeof e.kind!="number"||typeof e.content!="string"||typeof e.created_at!="number"||typeof e.pubkey!="string"||!fe(e.pubkey)||!Array.isArray(e.tags))return!1;for(let t=0;t<e.tags.length;t++){let n=e.tags[t];if(!Array.isArray(n))return!1;for(let r=0;r<n.length;r++)if(typeof n[r]!="string")return!1}return!0}var $i=class{generateSecretKey(){return Ze.utils.randomSecretKey()}getPublicKey(e){return P(Ze.getPublicKey(e))}finalizeEvent(e,t){let n=e;return n.pubkey=P(Ze.getPublicKey(t)),n.id=Ut(n),n.sig=P(Ze.sign(q(Ut(n)),t)),n[Xe]=!0,n}verifyEvent(e){if(typeof e[Xe]=="boolean")return e[Xe];try{let t=Ut(e);if(t!==e.id)return e[Xe]=!1,!1;let n=Ze.verify(q(e.sig),q(t),q(e.pubkey));return e[Xe]=n,n}catch{return e[Xe]=!1,!1}}};function Wi(e){if(!Dn(e))throw new Error("can't serialize event with wrong or missing properties");return JSON.stringify([0,e.pubkey,e.created_at,e.kind,e.tags,e.content])}function Ut(e){let t=ee(ge.encode(Wi(e)));return P(t)}var qt=new $i,Vn=qt.generateSecretKey,lt=qt.getPublicKey,ye=qt.finalizeEvent,Ye=qt.verifyEvent,Ki={};K(Ki,{AIEmbeddings:()=>qa,AppCurationSet:()=>xl,Application:()=>wl,AuthoredPodcasts:()=>qc,BadgeAward:()=>Qi,BadgeDefinition:()=>il,Bid:()=>pa,BidConfirmation:()=>ga,BlobsAuth:()=>Jc,BlockedRelaysList:()=>vc,BlossomServerList:()=>Oc,BookmarkList:()=>wc,Bookmarksets:()=>tl,Calendar:()=>Ml,CalendarEventRSVP:()=>Pl,CashuMintAnnouncement:()=>Fl,CashuWalletEvent:()=>Zc,CashuWalletHistory:()=>Ja,CashuWalletTokens:()=>Xa,ChannelCreation:()=>Wo,ChannelHideMessage:()=>Zo,ChannelMessage:()=>zo,ChannelMetadata:()=>Ko,ChannelMuteUser:()=>jo,ChatMessage:()=>ea,Chess:()=>ua,ClassifiedListing:()=>_l,ClientAuth:()=>Fo,CodeSnippet:()=>Aa,CoinjoinPool:()=>Ga,Comment:()=>ba,CommunitiesList:()=>bc,CommunityDefinition:()=>Kl,CommunityPostApproval:()=>Ka,ConferenceEvent:()=>Sl,Contacts:()=>Xi,CreateOrUpdateProduct:()=>ll,CreateOrUpdateStall:()=>cl,CuratedVideoSets:()=>rl,Curationsets:()=>nl,Date:()=>Nl,DecoupledEncryptionKeyDistribution:()=>Wa,DecoupledKeyAnnouncement:()=>Ic,DecoupledKeyClientAnnouncement:()=>$a,DirectMessageRelaysList:()=>Cc,DraftClassifiedListing:()=>Rl,DraftEvent:()=>Cl,DraftLong:()=>dl,Emojisets:()=>pl,EncryptedDirectMessage:()=>Ji,EventDeletion:()=>Yi,FavoriteFollowSets:()=>Lc,FavoritePodcasts:()=>Uc,FavoriteRelays:()=>Ac,FedimintAnnouncement:()=>Xl,Feed:()=>Ol,FileMessage:()=>oa,FileMetadata:()=>ma,FileServerPreference:()=>Nc,Followsets:()=>Yc,ForumThread:()=>na,GenericRepost:()=>zn,Genericlists:()=>Qc,GeocacheListing:()=>Zl,GeocacheLog:()=>Ya,GeocacheLogEntry:()=>jl,GeocacheProofOfFind:()=>Qa,GiftWrap:()=>Ht,GitPullRequest:()=>_a,GitPullRequestUpdate:()=>Ra,GoodWikiAuthorList:()=>Hc,GoodWikiRelayList:()=>Mc,GroupMetadata:()=>Yl,HTTPAuth:()=>Zn,Handlerinformation:()=>Vl,Handlerrecommendation:()=>Dl,Highlights:()=>pc,InteractiveRoom:()=>El,InterestsList:()=>_c,Interestsets:()=>al,Issue:()=>Ta,JobFeedback:()=>ja,JobRequest:()=>za,JobResult:()=>Za,Label:()=>Ma,LegacyNsiteFile:()=>$l,LightningPubRPC:()=>jc,LinkSet:()=>Ul,LiveChatMessage:()=>Sa,LiveEvent:()=>vl,LongFormArticle:()=>hl,MarketplaceUI:()=>fl,MediaFollows:()=>Tc,MediaStarterPacks:()=>of,MergeRequests:()=>ha,Metadata:()=>ji,ModularArticleContent:()=>yl,ModularArticleHeader:()=>gl,MuteSets:()=>ol,Mutelist:()=>gc,NWCWalletInfo:()=>Kc,NWCWalletRequest:()=>Xo,NWCWalletResponse:()=>Fc,NormalVideo:()=>aa,NostrConnect:()=>Xc,NsiteNamed:()=>zl,NsiteRoot:()=>zc,NutZap:()=>fc,NutZapInfo:()=>Rc,OpenTimestamps:()=>ya,Patch:()=>Ba,PeerToPeerOrderEvents:()=>Jl,Photo:()=>ia,Pinlist:()=>yc,PodcastEpisode:()=>fa,PodcastMetadata:()=>Pc,Poll:()=>wa,PollResponse:()=>da,PrivateDirectMessage:()=>$o,PrivateEventRelayList:()=>Bc,ProblemTracker:()=>Oa,ProductSoldAsAuction:()=>ul,ProfileBadges:()=>sl,ProxyAnnouncement:()=>$c,PublicChatsList:()=>xc,PublicMessage:()=>la,Reaction:()=>Kn,ReactionToWebsite:()=>sa,RecommendRelay:()=>Fi,Redirects:()=>Il,RelayDiscovery:()=>bl,RelayList:()=>mc,RelayMonitorAnnouncement:()=>Dc,RelayReview:()=>ql,RelayReviews:()=>Pa,Relaysets:()=>el,ReleaseArtifactSets:()=>ml,Reply:()=>La,Report:()=>Na,Reporting:()=>Ha,RepositoryAnnouncement:()=>Tl,RepositoryState:()=>Ll,Repost:()=>Wn,ReservedCashuWalletTokens:()=>Fa,RoomPresence:()=>Vc,Scroll:()=>va,Seal:()=>Nt,SearchRelaysList:()=>Ec,ShortTextNote:()=>Go,ShortVideo:()=>ca,SimpleGroupAdmins:()=>Ql,SimpleGroupCreateGroup:()=>oc,SimpleGroupCreateInvite:()=>ic,SimpleGroupDeleteEvent:()=>rc,SimpleGroupDeleteGroup:()=>sc,SimpleGroupEditMetadata:()=>nc,SimpleGroupJoinRequest:()=>ac,SimpleGroupLeaveRequest:()=>cc,SimpleGroupList:()=>Sc,SimpleGroupLiveKitParticipants:()=>nf,SimpleGroupMembers:()=>ef,SimpleGroupPutUser:()=>ec,SimpleGroupRemoveUser:()=>tc,SimpleGroupReply:()=>ra,SimpleGroupRoles:()=>tf,SimpleGroupThreadedReply:()=>ta,SlideSet:()=>Bl,SoftwareApplication:()=>Gl,StarterPacks:()=>rf,StatusApplied:()=>Ia,StatusClosed:()=>Ca,StatusDraft:()=>Ua,StatusOpen:()=>ka,TidalLogin:()=>uc,Time:()=>Hl,Torrent:()=>Da,TorrentComment:()=>Va,TransportMethodAnnouncement:()=>Wc,UserEmojiList:()=>kc,UserGraspList:()=>Gc,UserStatuses:()=>Al,VideoViewEvent:()=>Wl,Voice:()=>xa,VoiceComment:()=>Ea,WebBookmarks:()=>sf,WikiArticle:()=>kl,Zap:()=>dc,ZapGoal:()=>lc,ZapRequest:()=>hc,classifyKind:()=>zi,isAddressableKind:()=>$n,isEphemeralKind:()=>Vo,isKind:()=>Zi,isRegularKind:()=>Do,isReplaceableKind:()=>Gn});function Do(e){return e<1e4&&e!==0&&e!==3}function Gn(e){return e===0||e===3||1e4<=e&&e<2e4}function Vo(e){return 2e4<=e&&e<3e4}function $n(e){return 3e4<=e&&e<4e4}function zi(e){return Do(e)?"regular":Gn(e)?"replaceable":Vo(e)?"ephemeral":$n(e)?"parameterized":"unknown"}function Zi(e,t){let n=t instanceof Array?t:[t];return Dn(e)&&n.includes(e.kind)||!1}var ji=0,Go=1,Fi=2,Xi=3,Ji=4,Yi=5,Wn=6,Kn=7,Qi=8,ea=9,ta=10,na=11,ra=12,Nt=13,$o=14,oa=15,zn=16,sa=17,ia=20,aa=21,ca=22,la=24,Wo=40,Ko=41,zo=42,Zo=43,jo=44,fa=54,ua=64,ha=818,da=1018,pa=1021,ga=1022,ya=1040,Ht=1059,ma=1063,wa=1068,ba=1111,xa=1222,va=1227,Ea=1244,Sa=1311,Aa=1337,Ba=1617,_a=1618,Ra=1619,Ta=1621,La=1622,ka=1630,Ia=1631,Ca=1632,Ua=1633,Oa=1971,Na=1984,Ha=1984,Ma=1985,Pa=1986,qa=1987,Da=2003,Va=2004,Ga=2022,$a=4454,Wa=4455,Ka=4550,za=5999,Za=6999,ja=7e3,Fa=7374,Xa=7375,Ja=7376,Ya=7516,Qa=7517,ec=9e3,tc=9001,nc=9002,rc=9005,oc=9007,sc=9008,ic=9009,ac=9021,cc=9022,lc=9041,fc=9321,uc=9467,hc=9734,dc=9735,pc=9802,gc=1e4,yc=10001,mc=10002,wc=10003,bc=10004,xc=10005,vc=10006,Ec=10007,Sc=10009,Ac=10012,Bc=10013,_c=10015,Rc=10019,Tc=10020,Lc=10021,kc=10030,Ic=10044,Cc=10050,Uc=10054,Oc=10063,Nc=10096,Hc=10101,Mc=10102,Pc=10154,qc=10164,Dc=10166,Vc=10312,Gc=10317,$c=10377,Wc=11111,Kc=13194,zc=15128,Zc=17375,jc=21e3,Fo=22242,Xo=23194,Fc=23195,Xc=24133,Jc=24242,Zn=27235,Yc=3e4,Qc=30001,el=30002,tl=30003,nl=30004,rl=30005,ol=30007,sl=30008,il=30009,al=30015,cl=30017,ll=30018,fl=30019,ul=30020,hl=30023,dl=30024,pl=30030,gl=30040,yl=30041,ml=30063,wl=30078,bl=30166,xl=30267,vl=30311,El=30312,Sl=30313,Al=30315,Bl=30388,_l=30402,Rl=30403,Tl=30617,Ll=30618,kl=30818,Il=30819,Cl=31234,Ul=31388,Ol=31890,Nl=31922,Hl=31923,Ml=31924,Pl=31925,ql=31987,Dl=31989,Vl=31990,Gl=32267,$l=34128,Wl=34237,Kl=34550,zl=35128,Zl=37515,jl=37516,Fl=38172,Xl=38173,Jl=38383,Yl=39e3,Ql=39001,ef=39002,tf=39003,nf=39004,rf=39089,of=39092,sf=39701;var af={};K(af,{getHex64:()=>jn,getInt:()=>Jo,getSubscriptionId:()=>cf,matchEventId:()=>lf,matchEventKind:()=>uf,matchEventPubkey:()=>ff});function jn(e,t){let n=t.length+3,r=e.indexOf(`"${t}":`)+n,o=e.slice(r).indexOf('"')+r+1;return e.slice(o,o+64)}function Jo(e,t){let n=t.length,r=e.indexOf(`"${t}":`)+n+3,o=e.slice(r),s=Math.min(o.indexOf(","),o.indexOf("}"));return parseInt(o.slice(0,s),10)}function cf(e){let t=e.slice(0,22).indexOf('"EVENT"');if(t===-1)return null;let n=e.slice(t+7+1).indexOf('"');if(n===-1)return null;let r=t+7+1+n,o=e.slice(r+1,80).indexOf('"');if(o===-1)return null;let s=r+1+o;return e.slice(r+1,s)}function lf(e,t){return t===jn(e,"id")}function ff(e,t){return t===jn(e,"pubkey")}function uf(e,t){return t===Jo(e,"kind")}var hf={};K(hf,{makeAuthEvent:()=>df});function df(e,t){return{kind:Fo,created_at:Math.floor(Date.now()/1e3),tags:[["relay",e],["challenge",t]],content:""}}var pf;try{pf=WebSocket}catch{}var gf=256,gd=gf*2,yd=new TextEncoder;var yf;try{yf=WebSocket}catch{}var Fn={};K(Fn,{BECH32_REGEX:()=>Yo,Bech32MaxSize:()=>Xn,NostrTypeGuard:()=>mf,decode:()=>Dt,decodeNostrURI:()=>bf,encodeBytes:()=>Gt,naddrEncode:()=>Bf,neventEncode:()=>Af,noteEncode:()=>Ef,nprofileEncode:()=>Sf,npubEncode:()=>vf,nsecEncode:()=>xf});var mf={isNProfile:e=>/^nprofile1[a-z\d]+$/.test(e||""),isNEvent:e=>/^nevent1[a-z\d]+$/.test(e||""),isNAddr:e=>/^naddr1[a-z\d]+$/.test(e||""),isNSec:e=>/^nsec1[a-z\d]{58}$/.test(e||""),isNPub:e=>/^npub1[a-z\d]{58}$/.test(e||""),isNote:e=>/^note1[a-z\d]+$/.test(e||""),isNcryptsec:e=>/^ncryptsec1[a-z\d]+$/.test(e||"")},Xn=5e3,Yo=/[\x21-\x7E]{1,83}1[023456789acdefghjklmnpqrstuvwxyz]{6,}/;function wf(e){let t=new Uint8Array(4);return t[0]=e>>24&255,t[1]=e>>16&255,t[2]=e>>8&255,t[3]=e&255,t}function bf(e){try{return e.startsWith("nostr:")&&(e=e.substring(6)),Dt(e)}catch{return{type:"invalid",data:null}}}function Dt(e){let{prefix:t,words:n}=Ie.decode(e,Xn),r=new Uint8Array(Ie.fromWords(n));switch(t){case"nprofile":{let o=On(r);if(!o[0]?.[0])throw new Error("missing TLV 0 for nprofile");if(o[0][0].length!==32)throw new Error("TLV 0 should be 32 bytes");return{type:"nprofile",data:{pubkey:P(o[0][0]),relays:o[1]?o[1].map(s=>Re.decode(s)):[]}}}case"nevent":{let o=On(r);if(!o[0]?.[0])throw new Error("missing TLV 0 for nevent");if(o[0][0].length!==32)throw new Error("TLV 0 should be 32 bytes");if(o[2]&&o[2][0].length!==32)throw new Error("TLV 2 should be 32 bytes");if(o[3]&&o[3][0].length!==4)throw new Error("TLV 3 should be 4 bytes");return{type:"nevent",data:{id:P(o[0][0]),relays:o[1]?o[1].map(s=>Re.decode(s)):[],author:o[2]?.[0]?P(o[2][0]):void 0,kind:o[3]?.[0]?parseInt(P(o[3][0]),16):void 0}}}case"naddr":{let o=On(r);if(!o[0]?.[0])throw new Error("missing TLV 0 for naddr");if(!o[2]?.[0])throw new Error("missing TLV 2 for naddr");if(o[2][0].length!==32)throw new Error("TLV 2 should be 32 bytes");if(!o[3]?.[0])throw new Error("missing TLV 3 for naddr");if(o[3][0].length!==4)throw new Error("TLV 3 should be 4 bytes");return{type:"naddr",data:{identifier:Re.decode(o[0][0]),pubkey:P(o[2][0]),kind:parseInt(P(o[3][0]),16),relays:o[1]?o[1].map(s=>Re.decode(s)):[]}}}case"nsec":return{type:t,data:r};case"npub":case"note":return{type:t,data:P(r)};default:throw new Error(`unknown prefix ${t}`)}}function On(e){let t={},n=e;for(;n.length>0;){if(n.length<2)throw new Error("not enough data to read TLV");let r=n[0],o=n[1],s=n.slice(2,2+o);if(n=n.slice(2+o),s.length<o)throw new Error(`not enough data to read on TLV ${r}`);t[r]=t[r]||[],t[r].push(s)}return t}function xf(e){return Gt("nsec",e)}function vf(e){return Gt("npub",q(e))}function Ef(e){return Gt("note",q(e))}function Vt(e,t){let n=Ie.toWords(t);return Ie.encode(e,n,Xn)}function Gt(e,t){return Vt(e,t)}function Sf(e){let t=Jn({0:[q(e.pubkey)],1:(e.relays||[]).map(n=>ge.encode(n))});return Vt("nprofile",t)}function Af(e){let t;e.kind!==void 0&&(t=wf(e.kind));let n=Jn({0:[q(e.id)],1:(e.relays||[]).map(r=>ge.encode(r)),2:e.author?[q(e.author)]:[],3:t?[new Uint8Array(t)]:[]});return Vt("nevent",n)}function Bf(e){let t=new ArrayBuffer(4);new DataView(t).setUint32(0,e.kind,!1);let n=Jn({0:[ge.encode(e.identifier)],1:(e.relays||[]).map(r=>ge.encode(r)),2:[q(e.pubkey)],3:[new Uint8Array(t)]});return Vt("naddr",n)}function Jn(e){let t=[];return Object.entries(e).reverse().forEach(([n,r])=>{r.forEach(o=>{let s=new Uint8Array(o.length+2);s.set([parseInt(n)],0),s.set([o.length],1),s.set(o,2),t.push(s)})}),W(...t)}var _f={};K(_f,{decrypt:()=>Rf,encrypt:()=>Qo});function Qo(e,t,n){let r=e instanceof Uint8Array?e:q(e),o=Me.getSharedSecret(r,q("02"+t)),s=es(o),i=Uint8Array.from(ue(16)),a=ge.encode(n),c=Ln(s,i).encrypt(a),l=le.encode(new Uint8Array(c)),f=le.encode(new Uint8Array(i.buffer));return`${l}?iv=${f}`}function Rf(e,t,n){let r=e instanceof Uint8Array?e:q(e),[o,s]=n.split("?iv="),i=Me.getSharedSecret(r,q("02"+t)),a=es(i),c=le.decode(s),l=le.decode(o),f=Ln(a,c).decrypt(l);return Re.decode(f)}function es(e){return e.slice(1,33)}var Tf={};K(Tf,{NIP05_REGEX:()=>Yn,isNip05:()=>Lf,isValid:()=>Cf,queryProfile:()=>ts,searchDomain:()=>If,useFetchImplementation:()=>kf});var Yn=/^(?:([\w.+-]+)@)?([\w_-]+(\.[\w_-]+)+)$/,Lf=e=>Yn.test(e||""),$t;try{$t=fetch}catch{}function kf(e){$t=e}async function If(e,t=""){try{let n=`https://${e}/.well-known/nostr.json?name=${t}`,r=await $t(n,{redirect:"manual"});if(r.status!==200)throw Error("Wrong response code");return(await r.json()).names}catch{return{}}}async function ts(e){let t=e.match(Yn);if(!t)return null;let[,n="_",r]=t;try{let o=`https://${r}/.well-known/nostr.json?name=${n}`,s=await $t(o,{redirect:"manual"});if(s.status!==200)throw Error("Wrong response code");let i=await s.json(),a=i.names[n];return a?{pubkey:a,relays:i.relays?.[a]}:null}catch{return null}}async function Cf(e,t){let n=await ts(t);return n?n.pubkey===e:!1}var Uf={};K(Uf,{parse:()=>Of});function Of(e){let t={reply:void 0,root:void 0,mentions:[],profiles:[],quotes:[]},n,r;for(let o=e.tags.length-1;o>=0;o--){let s=e.tags[o];if(s[0]==="e"&&s[1]&&fe(s[1])){let[i,a,c,l,f]=s,u={id:a,relays:c?[c]:[],author:f&&fe(f)?f:void 0};if(l==="root"){t.root=u;continue}if(l==="reply"){t.reply=u;continue}if(l==="mention"){t.mentions.push(u);continue}n?r=u:n=u,t.mentions.push(u);continue}if(s[0]==="q"&&s[1]&&fe(s[1])){let[i,a,c]=s;t.quotes.push({id:a,relays:c?[c]:[]})}if(s[0]==="p"&&s[1]&&fe(s[1])){t.profiles.push({pubkey:s[1],relays:s[2]?[s[2]]:[]});continue}}return t.root||(t.root=r||n||t.reply),t.reply||(t.reply=n||t.root),[t.reply,t.root].forEach(o=>{if(!o)return;let s=t.mentions.indexOf(o);if(s!==-1&&t.mentions.splice(s,1),o.author){let i=t.profiles.find(a=>a.pubkey===o.author);i&&i.relays&&(o.relays||(o.relays=[]),i.relays.forEach(a=>{o.relays?.indexOf(a)===-1&&o.relays.push(a)}),i.relays=o.relays)}}),t.mentions.forEach(o=>{if(o.author){let s=t.profiles.find(i=>i.pubkey===o.author);s&&s.relays&&(o.relays||(o.relays=[]),s.relays.forEach(i=>{o.relays.indexOf(i)===-1&&o.relays.push(i)}),s.relays=o.relays)}}),t}var Nf={};K(Nf,{fetchRelayInformation:()=>Mf,useFetchImplementation:()=>Hf});var ns;try{ns=fetch}catch{}function Hf(e){ns=e}async function Mf(e){return await(await fetch(e.replace("ws://","http://").replace("wss://","https://"),{headers:{Accept:"application/nostr+json"}})).json()}var Pf={};K(Pf,{getPow:()=>qf,minePow:()=>Vf});function qf(e){let t=0;for(let n=0;n<64;n+=8){let r=parseInt(e.substring(n,n+8),16);if(r===0)t+=32;else{t+=Math.clz32(r);break}}return t}function Df(e){let t=0;for(let n=0;n<e.length;n++){let r=e[n];if(r===0)t+=8;else{t+=Math.clz32(r)-24;break}}return t}function Vf(e,t,n={}){let r=0,o=e,s=["nonce",r.toString(),t.toString()];for(o.tags.push(s);;){if(!n.keepCreatedAt){let a=Math.floor(new Date().getTime()/1e3);a!==o.created_at&&(r=0,o.created_at=a)}s[1]=(++r).toString();let i=ee(ge.encode(JSON.stringify([0,o.pubkey,o.created_at,o.kind,o.tags,o.content])));if(Df(i)>=t){o.id=P(i);break}}return o}var Gf={};K(Gf,{unwrapEvent:()=>Qf,unwrapManyEvents:()=>eu,wrapEvent:()=>ds,wrapManyEvents:()=>Yf});var $f={};K($f,{createRumor:()=>ir,createSeal:()=>Mt,createWrap:()=>Pt,unwrapEvent:()=>ar,unwrapManyEvents:()=>hs,wrapEvent:()=>us,wrapManyEvents:()=>Xf});var Wf={};K(Wf,{decrypt:()=>sr,encrypt:()=>or,getConversationKey:()=>nr,v2:()=>jf});var Qn=1,er=4294967295,tr=65536;function nr(e,t){let n=Me.getSharedSecret(e,q("02"+t)).subarray(1,33);return kt(ee,n,ge.encode("nip44-v2"))}function rs(e,t){let n=It(ee,e,t,76);return{chacha_key:n.subarray(0,32),chacha_nonce:n.subarray(32,44),hmac_key:n.subarray(44,76)}}function rr(e){if(!Number.isSafeInteger(e)||e<1)throw new Error("expected positive integer");if(e<=32)return 32;let t=2**(Math.floor(Math.log2(e-1))+1),n=t<=256?32:t/8;return n*(Math.floor((e-1)/n)+1)}function Kf(e){if(!Number.isSafeInteger(e)||e<Qn||e>65535)throw new Error("invalid plaintext size: must be between 1 and 65535 bytes");let t=new Uint8Array(2);return new DataView(t.buffer).setUint16(0,e,!1),t}function zf(e){if(!Number.isSafeInteger(e)||e<tr||e>er)throw new Error("invalid plaintext size: must be between 65536 and 4294967295 bytes");let t=new Uint8Array(4);return new DataView(t.buffer).setUint32(0,e,!1),t}function os(e){let t=ge.encode(e),n=t.length;if(n<Qn||n>er)throw new Error("invalid plaintext size: must be between 1 and 4294967295 bytes");let r=n>=tr?W(new Uint8Array([0,0]),zf(n)):Kf(n),o=new Uint8Array(rr(n)-n);return W(r,t,o)}function ss(e){let t=new DataView(e.buffer,e.byteOffset,e.byteLength),n=t.getUint16(0),r,o;if(n===0){if(r=t.getUint32(2),r<tr)throw new Error("invalid padding");o=6}else r=n,o=2;let s=e.subarray(o,o+r);if(r<Qn||r>er||s.length!==r||e.length!==o+rr(r))throw new Error("invalid padding");return Re.decode(s)}function is(e,t,n){if(n.length!==32)throw new Error("AAD associated data must be 32 bytes");let r=W(n,t);return be(ee,e,r)}function Zf(e){if(typeof e!="string")throw new Error("payload must be a valid string");let t=e.length;if(t<132)throw new Error("invalid payload length: "+t);if(e[0]==="#")throw new Error("unknown encryption version");let n;try{n=le.decode(e)}catch(s){throw new Error("invalid base64: "+s.message)}let r=n.length;if(r<99)throw new Error("invalid data length: "+r);let o=n[0];if(o!==2)throw new Error("unknown encryption version "+o);return{nonce:n.subarray(1,33),ciphertext:n.subarray(33,-32),mac:n.subarray(-32)}}function or(e,t,n=ue(32)){let{chacha_key:r,chacha_nonce:o,hmac_key:s}=rs(t,n),i=os(e),a=Ve(r,o,i),c=is(s,a,n);return le.encode(W(new Uint8Array([2]),n,a,c))}function sr(e,t){let{nonce:n,ciphertext:r,mac:o}=Zf(e),{chacha_key:s,chacha_nonce:i,hmac_key:a}=rs(t,n),c=is(a,r,n);if(!qe(c,o))throw new Error("invalid MAC");let l=Ve(s,i,r);return ss(l)}var jf={utils:{getConversationKey:nr,calcPaddedLen:rr,pad:os,unpad:ss},encrypt:or,decrypt:sr},Ff=2880*60,as=()=>Math.round(Date.now()/1e3),cs=()=>Math.round(as()-Math.random()*Ff),ls=(e,t)=>nr(e,t),fs=(e,t,n)=>or(JSON.stringify(e),ls(t,n)),No=(e,t)=>JSON.parse(sr(e.content,ls(t,e.pubkey)));function ir(e,t){let n={created_at:as(),content:"",tags:[],...e,pubkey:lt(t)};return n.id=Ut(n),n}function Mt(e,t,n){return ye({kind:Nt,content:fs(e,t,n),created_at:cs(),tags:[]},t)}function Pt(e,t){let n=Vn();return ye({kind:Ht,content:fs(e,n,t),created_at:cs(),tags:[["p",t]]},n)}function us(e,t,n){let r=ir(e,t),o=Mt(r,t,n);return Pt(o,n)}function Xf(e,t,n){if(!n||n.length===0)throw new Error("At least one recipient is required.");let r=lt(t),o=ir(e,t),s=[Pt(Mt(o,t,r),r)];return n.forEach(i=>{s.push(Pt(Mt(o,t,i),i))}),s}function ar(e,t){if(e.kind!==Ht)throw new Error(`unexpected wrap kind ${e.kind}, expected ${Ht}`);let n=No(e,t);if(n.kind!==Nt)throw new Error(`unexpected seal kind ${n.kind}, expected ${Nt}`);if(!Ye(n))throw new Error("seal signature is invalid");let r=No(n,t);if(r.pubkey!==n.pubkey)throw new Error(`rumor pubkey ${r.pubkey} does not match seal pubkey ${n.pubkey}`);return r}function hs(e,t){let n=[];return e.forEach(r=>{try{n.push(ar(r,t))}catch{}}),n.sort((r,o)=>r.created_at-o.created_at),n}function Jf(e,t,n,r,o){let s={created_at:o??Math.ceil(Date.now()/1e3),kind:$o,tags:[],content:t};return(Array.isArray(e)?e:[e]).forEach(({publicKey:a,relayUrl:c})=>{s.tags.push(c?["p",a,c]:["p",a])}),r&&s.tags.push(["e",r.eventId,r.relayUrl||"","reply"]),n&&s.tags.push(["subject",n]),s}function ds(e,t,n,r,o,s){let i=Jf(t,n,r,o,s);return us(i,e,t.publicKey)}function Yf(e,t,n,r,o,s){if(!t||t.length===0)throw new Error("At least one recipient is required.");let i=lt(e),a=s??Math.ceil(Date.now()/1e3);return[{publicKey:i},...t].map(c=>ds(e,c,n,r,o,a))}var Qf=ar,eu=hs,tu={};K(tu,{finishRepostEvent:()=>nu,getRepostedEvent:()=>ru,getRepostedEventPointer:()=>ps});function nu(e,t,n,r){let o,s=[...e.tags??[],["e",t.id,n],["p",t.pubkey]];return t.kind===Go?o=Wn:(o=zn,s.push(["k",String(t.kind)])),ye({kind:o,tags:s,content:e.content===""||t.tags?.find(i=>i[0]==="-")?"":JSON.stringify(t),created_at:e.created_at},r)}function ps(e){if(![Wn,zn].includes(e.kind))return;let t,n;for(let r=e.tags.length-1;r>=0&&(t===void 0||n===void 0);r--){let o=e.tags[r];o.length>=2&&(o[0]==="e"&&t===void 0?t=o:o[0]==="p"&&n===void 0&&(n=o))}if(t!==void 0)return{id:t[1],relays:[t[2],n?.[2]].filter(r=>typeof r=="string"),author:n?.[1]}}function ru(e,{skipVerification:t}={}){let n=ps(e);if(n===void 0||e.content==="")return;let r;try{r=JSON.parse(e.content)}catch{return}if(r.id===n.id&&!(!t&&!Ye(r)))return r}var ou={};K(ou,{NOSTR_URI_REGEX:()=>cr,parse:()=>iu,test:()=>su});var cr=new RegExp(`nostr:(${Yo.source})`);function su(e){return typeof e=="string"&&new RegExp(`^${cr.source}$`).test(e)}function iu(e){let t=e.match(new RegExp(`^${cr.source}$`));if(!t)throw new Error(`Invalid Nostr URI: ${e}`);return{uri:t[0],value:t[1],decoded:Dt(t[1])}}var au={};K(au,{parse:()=>lu});function Ho(e){if(e)return/^\d+$/.test(e)?parseInt(e,10):e}function gs(e,t){let n=e.indexOf(":"),r=e.indexOf(":",n+1);if(n===-1||r===-1)return;let o=parseInt(e.slice(0,n),10);if(Number.isNaN(o))return;let s=e.slice(n+1,r);if(fe(s))return{kind:o,pubkey:s,identifier:e.slice(r+1),relays:t?[t]:[]}}function Mo(e){switch(e[0]){case"E":case"e":return!e[1]||!fe(e[1])?void 0:{id:e[1],relays:e[2]?[e[2]]:[],author:e[3]&&fe(e[3])?e[3]:void 0};case"A":case"a":return e[1]?gs(e[1],e[2]):void 0;case"I":case"i":return e[1]?{value:e[1],hint:e[2]}:void 0}}function cu(e){if(e[1]){if(e[1].includes(":"))return gs(e[1],e[2]);if(fe(e[1]))return{id:e[1],relays:e[2]?[e[2]]:[],author:e[3]&&fe(e[3])?e[3]:void 0}}}function Po(e){return e.findLast(t=>t.tagName==="A"||t.tagName==="a")?.pointer||e.findLast(t=>t.tagName==="I"||t.tagName==="i")?.pointer||e.findLast(t=>t.tagName==="E"||t.tagName==="e")?.pointer}function Nn(e,t){if(!e||!("id"in e)||!e.author)return;let n=t.find(r=>r.pubkey===e.author);!n||!n.relays||(e.relays||(e.relays=[]),n.relays.forEach(r=>{e.relays.indexOf(r)===-1&&e.relays.push(r)}),n.relays=e.relays)}function lu(e){let t={root:void 0,rootKind:void 0,reply:void 0,replyKind:void 0,mentions:[],quotes:[],profiles:[]},n=[],r=[];for(let o of e.tags){if((o[0]==="E"||o[0]==="A"||o[0]==="I")&&o[1]){let s=Mo(o);s&&n.push({tagName:o[0],pointer:s});continue}if((o[0]==="e"||o[0]==="a"||o[0]==="i")&&o[1]){let s=Mo(o);s&&r.push({tagName:o[0],pointer:s});continue}if(o[0]==="K"){t.rootKind=Ho(o[1]);continue}if(o[0]==="k"){t.replyKind=Ho(o[1]);continue}if(o[0]==="q"){let s=cu(o);s&&t.quotes.push(s);continue}(o[0]==="P"||o[0]==="p")&&o[1]&&fe(o[1])&&t.profiles.push({pubkey:o[1],relays:o[2]?[o[2]]:[]})}return t.root=Po(n),t.reply=Po(r),Nn(t.root,t.profiles),Nn(t.reply,t.profiles),t.quotes.forEach(o=>Nn(o,t.profiles)),t}var fu={};K(fu,{finishReactionEvent:()=>uu,getReactedEventPointer:()=>hu});function uu(e,t,n){let r=t.tags.filter(o=>o.length>=2&&(o[0]==="e"||o[0]==="p"));return ye({...e,kind:Kn,tags:[...e.tags??[],...r,["e",t.id],["p",t.pubkey]],content:e.content??"+"},n)}function hu(e){if(e.kind!==Kn)return;let t,n;for(let r=e.tags.length-1;r>=0&&(t===void 0||n===void 0);r--){let o=e.tags[r];o.length>=2&&(o[0]==="e"&&t===void 0?t=o:o[0]==="p"&&n===void 0&&(n=o))}if(!(t===void 0||n===void 0))return{id:t[1],relays:[t[2],n[2]].filter(r=>r!==void 0),author:n[1]}}var du={};K(du,{parse:()=>gu});var Hn=/\W/m,pu=42;function qo(e,t){let n=e.slice(t).search(/\s/),r=n===-1?e.length:t+n,o=e.slice(t,r).match(/[.,]*[^\w\/]?[.,]*$/);return r-o[0].length}function*gu(e){let t=[];if(typeof e!="string"){for(let s=0;s<e.tags.length;s++){let i=e.tags[s];i[0]==="emoji"&&i.length>=3&&t.push({type:"emoji",shortcode:i[1],url:i[2]})}e=e.content}let n=e.length,r=0,o=0;e:for(;o<n;){let s=e.indexOf(":",o),i=e.indexOf("#",o);if(s===-1&&i===-1)break e;if(s===-1||i>=0&&i<s){if(i===0||e[i-1].match(Hn)){let a=e.slice(i+1,i+pu).match(Hn),c=a?i+1+a.index:n;yield{type:"text",text:e.slice(r,i),start:r,end:i},yield{type:"hashtag",value:e.slice(i+1,c),start:i,end:c},o=c,r=o;continue e}o=i+1;continue e}if(e.slice(s-5,s)==="nostr"){let a=e.slice(s+60).match(Hn),c=a?s+60+a.index:n;try{let l,{data:f,type:u}=Dt(e.slice(s+1,c));switch(u){case"npub":l={pubkey:f};break;case"note":l={id:f};break;case"nsec":o=c+1;continue;default:l=f}r!==s-5&&(yield{type:"text",text:e.slice(r,s-5),start:r,end:s-5}),yield{type:"reference",pointer:l,start:s-5,end:c},o=c,r=o;continue e}catch{o=s+1;continue e}}else if(e.slice(s-5,s)==="https"||e.slice(s-4,s)==="http"){let a=qo(e,s+4),c=e[s-1]==="s"?5:4;try{let l=new URL(e.slice(s-c,a));if(l.hostname.indexOf(".")===-1)throw new Error("invalid url");if(r!==s-c&&(yield{type:"text",text:e.slice(r,s-c),start:r,end:s-c}),/\.(png|jpe?g|gif|webp|heic|svg)$/i.test(l.pathname)){yield{type:"image",url:l.toString(),start:s-c,end:a},o=a,r=o;continue e}if(/\.(mp4|avi|webm|mkv|mov)$/i.test(l.pathname)){yield{type:"video",url:l.toString(),start:s-c,end:a},o=a,r=o;continue e}if(/\.(mp3|aac|ogg|opus|wav|flac)$/i.test(l.pathname)){yield{type:"audio",url:l.toString(),start:s-c,end:a},o=a,r=o;continue e}yield{type:"url",url:l.toString(),start:s-c,end:a},o=a,r=o;continue e}catch{o=a+1;continue e}}else if(e.slice(s-3,s)==="wss"||e.slice(s-2,s)==="ws"){let a=qo(e,s+4),c=e[s-1]==="s"?3:2;try{let l=new URL(e.slice(s-c,a));if(l.hostname.indexOf(".")===-1)throw new Error("invalid ws url");r!==s-c&&(yield{type:"text",text:e.slice(r,s-c),start:r,end:s-c}),yield{type:"relay",url:l.toString(),start:s-c,end:a},o=a,r=o;continue e}catch{o=a+1;continue e}}else{for(let a=0;a<t.length;a++){let c=t[a];if(e[s+c.shortcode.length+1]===":"&&e.slice(s+1,s+c.shortcode.length+1)===c.shortcode){r!==s&&(yield{type:"text",text:e.slice(r,s),start:r,end:s}),yield{...c,start:s,end:s+c.shortcode.length+2},o=s+c.shortcode.length+2,r=o;continue e}}o=s+1;continue e}}r!==n&&(yield{type:"text",text:e.slice(r),start:r,end:n})}var yu={};K(yu,{channelCreateEvent:()=>mu,channelHideMessageEvent:()=>xu,channelMessageEvent:()=>bu,channelMetadataEvent:()=>wu,channelMuteUserEvent:()=>vu});var mu=(e,t)=>{let n;if(typeof e.content=="object")n=JSON.stringify(e.content);else if(typeof e.content=="string")n=e.content;else return;return ye({kind:Wo,tags:[...e.tags??[]],content:n,created_at:e.created_at},t)},wu=(e,t)=>{let n;if(typeof e.content=="object")n=JSON.stringify(e.content);else if(typeof e.content=="string")n=e.content;else return;return ye({kind:Ko,tags:[["e",e.channel_create_event_id],...e.tags??[]],content:n,created_at:e.created_at},t)},bu=(e,t)=>{let n=[["e",e.channel_create_event_id,e.relay_url,"root"]];return e.reply_to_channel_message_event_id&&n.push(["e",e.reply_to_channel_message_event_id,e.relay_url,"reply"]),ye({kind:zo,tags:[...n,...e.tags??[]],content:e.content,created_at:e.created_at},t)},xu=(e,t)=>{let n;if(typeof e.content=="object")n=JSON.stringify(e.content);else if(typeof e.content=="string")n=e.content;else return;return ye({kind:Zo,tags:[["e",e.channel_message_event_id],...e.tags??[]],content:n,created_at:e.created_at},t)},vu=(e,t)=>{let n;if(typeof e.content=="object")n=JSON.stringify(e.content);else if(typeof e.content=="string")n=e.content;else return;return ye({kind:jo,tags:[["p",e.pubkey_to_mute],...e.tags??[]],content:n,created_at:e.created_at},t)},Eu={};K(Eu,{EMOJI_SHORTCODE_REGEX:()=>ys,matchAll:()=>Su,regex:()=>lr,replaceAll:()=>Au});var ys=/:(\w+):/,lr=()=>new RegExp(`\\B${ys.source}\\B`,"g");function*Su(e){let t=e.matchAll(lr());for(let n of t)try{let[r,o]=n;yield{shortcode:r,name:o,start:n.index,end:n.index+r.length}}catch{}}function Au(e,t){return e.replaceAll(lr(),(n,r)=>t({shortcode:n,name:r}))}var Bu={};K(Bu,{useFetchImplementation:()=>_u,validateGithub:()=>Ru});var fr;try{fr=fetch}catch{}function _u(e){fr=e}async function Ru(e,t,n){try{return await(await fr(`https://gist.github.com/${t}/${n}/raw`)).text()===`Verifying that I control the following Nostr public key: ${e}`}catch{return!1}}var Tu={};K(Tu,{makeNwcRequestEvent:()=>ku,parseConnectionString:()=>Lu});function Lu(e){let{host:t,pathname:n,searchParams:r}=new URL(e),o=n||t,s=r.getAll("relay"),i=r.get("secret");if(!o||s.length===0||!i)throw new Error("invalid connection string");return{pubkey:o,relay:s[0],relays:s,secret:i}}async function ku(e,t,n){let o=Qo(t,e,JSON.stringify({method:"pay_invoice",params:{invoice:n}})),s={kind:Xo,created_at:Math.round(Date.now()/1e3),content:o,tags:[["p",e]]};return ye(s,t)}var Iu={};K(Iu,{normalizeIdentifier:()=>Cu});function Cu(e){return e=e.trim().toLowerCase(),e=e.normalize("NFKC"),Array.from(e).map(t=>/\p{Letter}/u.test(t)||/\p{Number}/u.test(t)?t:"-").join("")}var Uu={};K(Uu,{getSatoshisAmountFromBolt11:()=>qu,getZapEndpoint:()=>Nu,makeZapReceipt:()=>Pu,makeZapRequest:()=>Hu,useFetchImplementation:()=>Ou,validateZapRequest:()=>Mu});var ur;try{ur=fetch}catch{}function Ou(e){ur=e}async function Nu(e){try{let t="",{lud06:n,lud16:r}=JSON.parse(e.content);if(r){let[i,a]=r.split("@");t=new URL(`/.well-known/lnurlp/${i}`,`https://${a}`).toString()}else if(n){let{words:i}=Ie.decode(n,1e3),a=Ie.fromWords(i);t=Re.decode(a)}else return null;let s=await(await ur(t)).json();if(s.allowsNostr&&s.nostrPubkey)return s.callback}catch{}return null}function Hu(e){let t={kind:9734,created_at:Math.round(Date.now()/1e3),content:e.comment||"",tags:[["p","pubkey"in e?e.pubkey:e.event.pubkey],["amount",e.amount.toString()],["relays",...e.relays]]};if("event"in e){if(t.tags.push(["e",e.event.id]),Gn(e.event.kind)){let n=["a",`${e.event.kind}:${e.event.pubkey}:`];t.tags.push(n)}else if($n(e.event.kind)){let n=e.event.tags.find(([o,s])=>o==="d"&&s);if(!n)throw new Error("d tag not found or is empty");let r=["a",`${e.event.kind}:${e.event.pubkey}:${n[1]}`];t.tags.push(r)}t.tags.push(["k",e.event.kind.toString()])}return t}function Mu(e){let t;try{t=JSON.parse(e)}catch{return"Invalid zap request JSON."}if(!Dn(t))return"Zap request is not a valid Nostr event.";if(!Ye(t))return"Invalid signature on zap request.";let n=t.tags.find(([s,i])=>s==="p"&&i);if(!n)return"Zap request doesn't have a 'p' tag.";if(!fe(n[1]))return"Zap request 'p' tag is not valid hex.";if(t.tags.filter(([s])=>s==="p").length>1)return"Zap request has more than one 'p' tag.";let r=t.tags.find(([s,i])=>s==="e"&&i);return r&&!fe(r[1])?"Zap request 'e' tag is not valid hex.":t.tags.filter(([s])=>s==="e").length>1?"Zap request has more than one 'e' tag.":t.tags.find(([s,i])=>s==="relays"&&i)?null:"Zap request doesn't have a 'relays' tag."}function Pu({zapRequest:e,preimage:t,bolt11:n,paidAt:r}){let o=JSON.parse(e),s=o.tags.filter(([a])=>a==="e"||a==="p"||a==="a"),i={kind:9735,created_at:Math.round(r.getTime()/1e3),content:"",tags:[...s,["P",o.pubkey],["bolt11",n],["description",e]]};return t&&i.tags.push(["preimage",t]),i}function qu(e){if(e.length<50)return 0;e=e.substring(0,50);let t=e.lastIndexOf("1");if(t===-1)return 0;let n=e.substring(0,t);if(!n.startsWith("lnbc"))return 0;let r=n.substring(4);if(r.length<1)return 0;let o=r[r.length-1],s=o.charCodeAt(0)-48,i=s>=0&&s<=9,a=r.length-1;if(i&&a++,a<1)return 0;let c=parseInt(r.substring(0,a));switch(o){case"m":return c*1e5;case"u":return c*100;case"n":return c/10;case"p":return c/1e4;default:return c*1e8}}var Du={};K(Du,{Negentropy:()=>ws,NegentropyStorageVector:()=>$u,NegentropySync:()=>Wu});var Mn=97,Je=32,ms=16,Ge={Skip:0,Fingerprint:1,IdList:2},_e=class{constructor(e){E(this,"_raw");E(this,"length");typeof e=="number"?(this._raw=new Uint8Array(e),this.length=0):e instanceof Uint8Array?(this._raw=new Uint8Array(e),this.length=e.length):(this._raw=new Uint8Array(512),this.length=0)}unwrap(){return this._raw.subarray(0,this.length)}get capacity(){return this._raw.byteLength}extend(e){if(e instanceof _e&&(e=e.unwrap()),typeof e.length!="number")throw Error("bad length");let t=e.length+this.length;if(this.capacity<t){let n=this._raw,r=Math.max(this.capacity*2,t);this._raw=new Uint8Array(r),this._raw.set(n)}this._raw.set(e,this.length),this.length+=e.length}shift(){let e=this._raw[0];return this._raw=this._raw.subarray(1),this.length--,e}shiftN(e=1){let t=this._raw.subarray(0,e);return this._raw=this._raw.subarray(e),this.length-=e,t}};function Ct(e){let t=0;for(;;){if(e.length===0)throw Error("parse ends prematurely");let n=e.shift();if(t=t<<7|n&127,(n&128)===0)break}return t}function Be(e){if(e===0)return new _e(new Uint8Array([0]));let t=[];for(;e!==0;)t.push(e&127),e>>>=7;t.reverse();for(let n=0;n<t.length-1;n++)t[n]|=128;return new _e(new Uint8Array(t))}function Vu(e){return Ot(e,1)[0]}function Ot(e,t){if(e.length<t)throw Error("parse ends prematurely");return e.shiftN(t)}var Gu=class{constructor(){E(this,"buf");this.setToZero()}setToZero(){this.buf=new Uint8Array(Je)}add(e){let t=0,n=0,r=new DataView(this.buf.buffer),o=new DataView(e.buffer);for(let s=0;s<8;s++){let i=s*4,a=r.getUint32(i,!0),c=o.getUint32(i,!0),l=a;l+=t,l+=c,l>4294967295&&(n=1),r.setUint32(i,l&4294967295,!0),t=n,n=0}}negate(){let e=new DataView(this.buf.buffer);for(let n=0;n<8;n++){let r=n*4;e.setUint32(r,~e.getUint32(r,!0))}let t=new Uint8Array(Je);t[0]=1,this.add(t)}getFingerprint(e){let t=new _e;return t.extend(this.buf),t.extend(Be(e)),ee(t.unwrap()).subarray(0,ms)}},$u=class{constructor(){E(this,"items");E(this,"sealed");this.items=[],this.sealed=!1}insert(e,t){if(this.sealed)throw Error("already sealed");let n=q(t);if(n.byteLength!==Je)throw Error("bad id size for added item");this.items.push({timestamp:e,id:n})}seal(){if(this.sealed)throw Error("already sealed");this.sealed=!0,this.items.sort(Pn);for(let e=1;e<this.items.length;e++)if(Pn(this.items[e-1],this.items[e])===0)throw Error("duplicate item inserted")}unseal(){this.sealed=!1}size(){return this._checkSealed(),this.items.length}getItem(e){if(this._checkSealed(),e>=this.items.length)throw Error("out of range");return this.items[e]}iterate(e,t,n){this._checkSealed(),this._checkBounds(e,t);for(let r=e;r<t&&n(this.items[r],r);++r);}findLowerBound(e,t,n){return this._checkSealed(),this._checkBounds(e,t),this._binarySearch(this.items,e,t,r=>Pn(r,n)<0)}fingerprint(e,t){let n=new Gu;return n.setToZero(),this.iterate(e,t,r=>(n.add(r.id),!0)),n.getFingerprint(t-e)}_checkSealed(){if(!this.sealed)throw Error("not sealed")}_checkBounds(e,t){if(e>t||t>this.items.length)throw Error("bad range")}_binarySearch(e,t,n,r){let o=n-t;for(;o>0;){let s=t,i=Math.floor(o/2);s+=i,r(e[s])?(t=++s,o-=i+1):o=i}return t}},ws=class{constructor(e,t=6e4){E(this,"storage");E(this,"frameSizeLimit");E(this,"lastTimestampIn");E(this,"lastTimestampOut");if(t<4096)throw Error("frameSizeLimit too small");this.storage=e,this.frameSizeLimit=t,this.lastTimestampIn=0,this.lastTimestampOut=0}_bound(e,t){return{timestamp:e,id:t||new Uint8Array(0)}}initiate(){let e=new _e;return e.extend(new Uint8Array([Mn])),this.splitRange(0,this.storage.size(),this._bound(Number.MAX_VALUE),e),P(e.unwrap())}reconcile(e,t,n){let r=new _e(q(e));this.lastTimestampIn=this.lastTimestampOut=0;let o=new _e;o.extend(new Uint8Array([Mn]));let s=Vu(r);if(s<96||s>111)throw Error("invalid negentropy protocol version byte");if(s!==Mn)throw Error("unsupported negentropy protocol version requested: "+(s-96));let i=this.storage.size(),a=this._bound(0),c=0,l=!1;for(;r.length!==0;){let f=new _e,u=()=>{l&&(l=!1,f.extend(this.encodeBound(a)),f.extend(Be(Ge.Skip)))},y=this.decodeBound(r),p=Ct(r),g=c,w=this.storage.findLowerBound(c,i,y);if(p===Ge.Skip)l=!0;else if(p===Ge.Fingerprint){let m=Ot(r,ms),v=this.storage.fingerprint(g,w);bs(m,v)!==0?(u(),this.splitRange(g,w,y,f)):l=!0}else if(p===Ge.IdList){let m=Ct(r),v={};for(let B=0;B<m;B++){let C=Ot(r,Je);v[P(C)]=C}if(l=!0,this.storage.iterate(g,w,B=>{let C=B.id,H=P(C);return v[H]?delete v[P(C)]:t?.(H),!0}),n)for(let B of Object.values(v))n(P(B))}else throw Error("unexpected mode");if(this.exceededFrameSizeLimit(o.length+f.length)){let m=this.storage.fingerprint(w,i);o.extend(this.encodeBound(this._bound(Number.MAX_VALUE))),o.extend(Be(Ge.Fingerprint)),o.extend(m);break}else o.extend(f);c=w,a=y}return o.length===1?null:P(o.unwrap())}splitRange(e,t,n,r){let o=t-e,s=16;if(o<s*2)r.extend(this.encodeBound(n)),r.extend(Be(Ge.IdList)),r.extend(Be(o)),this.storage.iterate(e,t,i=>(r.extend(i.id),!0));else{let i=Math.floor(o/s),a=o%s,c=e;for(let l=0;l<s;l++){let f=i+(l<a?1:0),u=this.storage.fingerprint(c,c+f);c+=f;let y;if(c===t)y=n;else{let p,g;this.storage.iterate(c-1,c+1,(w,m)=>(m===c-1?p=w:g=w,!0)),y=this.getMinimalBound(p,g)}r.extend(this.encodeBound(y)),r.extend(Be(Ge.Fingerprint)),r.extend(u)}}}exceededFrameSizeLimit(e){return e>this.frameSizeLimit-200}decodeTimestampIn(e){let t=Ct(e);return t=t===0?Number.MAX_VALUE:t-1,this.lastTimestampIn===Number.MAX_VALUE||t===Number.MAX_VALUE?(this.lastTimestampIn=Number.MAX_VALUE,Number.MAX_VALUE):(t+=this.lastTimestampIn,this.lastTimestampIn=t,t)}decodeBound(e){let t=this.decodeTimestampIn(e),n=Ct(e);if(n>Je)throw Error("bound key too long");let r=Ot(e,n);return{timestamp:t,id:r}}encodeTimestampOut(e){if(e===Number.MAX_VALUE)return this.lastTimestampOut=Number.MAX_VALUE,Be(0);let t=e;return e-=this.lastTimestampOut,this.lastTimestampOut=t,Be(e+1)}encodeBound(e){let t=new _e;return t.extend(this.encodeTimestampOut(e.timestamp)),t.extend(Be(e.id.length)),t.extend(e.id),t}getMinimalBound(e,t){if(t.timestamp!==e.timestamp)return this._bound(t.timestamp);{let n=0,r=t.id,o=e.id;for(let s=0;s<Je&&r[s]===o[s];s++)n++;return this._bound(t.timestamp,t.id.subarray(0,n+1))}}};function bs(e,t){for(let n=0;n<e.byteLength;n++){if(e[n]<t[n])return-1;if(e[n]>t[n])return 1}return e.byteLength>t.byteLength?1:e.byteLength<t.byteLength?-1:0}function Pn(e,t){return e.timestamp===t.timestamp?bs(e.id,t.id):e.timestamp-t.timestamp}var Wu=class{constructor(e,t,n,r={}){E(this,"relay");E(this,"storage");E(this,"neg");E(this,"filter");E(this,"subscription");E(this,"onhave");E(this,"onneed");this.relay=e,this.storage=t,this.neg=new ws(t),this.onhave=r.onhave,this.onneed=r.onneed,this.filter=n,this.subscription=this.relay.prepareSubscription([{}],{label:r.label||"negentropy"}),this.subscription.oncustom=o=>{switch(o[0]){case"NEG-MSG":{o.length<3&&console.warn(`got invalid NEG-MSG from ${this.relay.url}: ${o}`);try{let s=this.neg.reconcile(o[2],this.onhave,this.onneed);s?this.relay.send(`["NEG-MSG", "${this.subscription.id}", "${s}"]`):(this.close(),r.onclose?.())}catch(s){console.error("negentropy reconcile error:",s),r?.onclose?.(`reconcile error: ${s}`)}break}case"NEG-CLOSE":{let s=o[2];console.warn("negentropy error:",s),r.onclose?.(s);break}case"NEG-ERR":r.onclose?.(o[2])}}}async start(){let e=this.neg.initiate();this.relay.send(`["NEG-OPEN","${this.subscription.id}",${JSON.stringify(this.filter)},"${e}"]`)}close(){this.relay.send(`["NEG-CLOSE","${this.subscription.id}"]`),this.subscription.close()}},Ku={};K(Ku,{getToken:()=>zu,hashPayload:()=>hr,unpackEventFromToken:()=>vs,validateEvent:()=>Rs,validateEventKind:()=>Ss,validateEventMethodTag:()=>Bs,validateEventPayloadTag:()=>_s,validateEventTimestamp:()=>Es,validateEventUrlTag:()=>As,validateToken:()=>Zu});var xs="Nostr ";async function zu(e,t,n,r=!1,o){let s={kind:Zn,tags:[["u",e],["method",t]],created_at:Math.round(new Date().getTime()/1e3),content:""};o&&s.tags.push(["payload",hr(o)]);let i=await n(s);return(r?xs:"")+le.encode(ge.encode(JSON.stringify(i)))}async function Zu(e,t,n){let r=await vs(e).catch(s=>{throw s});return await Rs(r,t,n).catch(s=>{throw s})}async function vs(e){if(!e)throw new Error("Missing token");e=e.replace(xs,"");let t=Re.decode(le.decode(e));if(!t||t.length===0||!t.startsWith("{"))throw new Error("Invalid token");return JSON.parse(t)}function Es(e){return e.created_at?Math.abs(Math.round(new Date().getTime()/1e3)-e.created_at)<60:!1}function Ss(e){return e.kind===Zn}function As(e,t){let n=e.tags.find(r=>r[0]==="u");return n?n.length>0&&n[1]===t:!1}function Bs(e,t){let n=e.tags.find(r=>r[0]==="method");return n?n.length>0&&n[1].toLowerCase()===t.toLowerCase():!1}function hr(e){let t=ee(ge.encode(JSON.stringify(e)));return P(t)}function _s(e,t){let n=e.tags.find(o=>o[0]==="payload");if(!n)return!1;let r=hr(t);return n.length>0&&n[1]===r}async function Rs(e,t,n,r){if(!Ye(e))throw new Error("Invalid nostr event, signature invalid");if(!Ss(e))throw new Error("Invalid nostr event, kind invalid");if(!Es(e))throw new Error("Invalid nostr event, created_at timestamp invalid");if(!As(e,t))throw new Error("Invalid nostr event, url tag invalid");if(!Bs(e,n))throw new Error("Invalid nostr event, method tag invalid");if(r&&typeof r=="object"&&Object.keys(r).length>0&&!_s(e,r))throw new Error("Invalid nostr event, payload tag does not match request body hash");return!0}var mr={};Ms(mr,{decrypt:()=>Ns,encrypt:()=>Os,getConversationKey:()=>Ls,v2:()=>Yu});var ju=new TextDecoder("utf-8"),Ts=new TextEncoder,dr=1,pr=4294967295,gr=65536;function Ls(e,t){let n=Me.getSharedSecret(e,q("02"+t)).subarray(1,33);return kt(ee,n,Ts.encode("nip44-v2"))}function ks(e,t){let n=It(ee,e,t,76);return{chacha_key:n.subarray(0,32),chacha_nonce:n.subarray(32,44),hmac_key:n.subarray(44,76)}}function yr(e){if(!Number.isSafeInteger(e)||e<1)throw new Error("expected positive integer");if(e<=32)return 32;let t=2**(Math.floor(Math.log2(e-1))+1),n=t<=256?32:t/8;return n*(Math.floor((e-1)/n)+1)}function Fu(e){if(!Number.isSafeInteger(e)||e<dr||e>65535)throw new Error("invalid plaintext size: must be between 1 and 65535 bytes");let t=new Uint8Array(2);return new DataView(t.buffer).setUint16(0,e,!1),t}function Xu(e){if(!Number.isSafeInteger(e)||e<gr||e>pr)throw new Error("invalid plaintext size: must be between 65536 and 4294967295 bytes");let t=new Uint8Array(4);return new DataView(t.buffer).setUint32(0,e,!1),t}function Is(e){let t=Ts.encode(e),n=t.length;if(n<dr||n>pr)throw new Error("invalid plaintext size: must be between 1 and 4294967295 bytes");let r=n>=gr?W(new Uint8Array([0,0]),Xu(n)):Fu(n),o=new Uint8Array(yr(n)-n);return W(r,t,o)}function Cs(e){let t=new DataView(e.buffer,e.byteOffset,e.byteLength),n=t.getUint16(0),r,o;if(n===0){if(r=t.getUint32(2),r<gr)throw new Error("invalid padding");o=6}else r=n,o=2;let s=e.subarray(o,o+r);if(r<dr||r>pr||s.length!==r||e.length!==o+yr(r))throw new Error("invalid padding");return ju.decode(s)}function Us(e,t,n){if(n.length!==32)throw new Error("AAD associated data must be 32 bytes");let r=W(n,t);return be(ee,e,r)}function Ju(e){if(typeof e!="string")throw new Error("payload must be a valid string");let t=e.length;if(t<132)throw new Error("invalid payload length: "+t);if(e[0]==="#")throw new Error("unknown encryption version");let n;try{n=le.decode(e)}catch(s){throw new Error("invalid base64: "+s.message)}let r=n.length;if(r<99)throw new Error("invalid data length: "+r);let o=n[0];if(o!==2)throw new Error("unknown encryption version "+o);return{nonce:n.subarray(1,33),ciphertext:n.subarray(33,-32),mac:n.subarray(-32)}}function Os(e,t,n=ue(32)){let{chacha_key:r,chacha_nonce:o,hmac_key:s}=ks(t,n),i=Is(e),a=Ve(r,o,i),c=Us(s,a,n);return le.encode(W(new Uint8Array([2]),n,a,c))}function Ns(e,t){let{nonce:n,ciphertext:r,mac:o}=Ju(e),{chacha_key:s,chacha_nonce:i,hmac_key:a}=ks(t,n),c=Us(a,r,n);if(!qe(c,o))throw new Error("invalid MAC");let l=Ve(s,i,r);return Cs(l)}var Yu={utils:{getConversationKey:Ls,calcPaddedLen:yr,pad:Is,unpad:Cs},encrypt:Os,decrypt:Ns};window.NT={generateSecretKey:Vn,getPublicKey:lt,finalizeEvent:ye,verifyEvent:Ye,nip19:Fn,nip44:mr};})();
+/*! Bundled license information:
+
+@noble/hashes/utils.js:
+  (*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) *)
+
+@noble/curves/utils.js:
+@noble/curves/abstract/modular.js:
+@noble/curves/abstract/curve.js:
+@noble/curves/abstract/weierstrass.js:
+@noble/curves/secp256k1.js:
+  (*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) *)
+
+@scure/base/index.js:
+  (*! scure-base - MIT License (c) 2022 Paul Miller (paulmillr.com) *)
+
+@noble/ciphers/utils.js:
+  (*! noble-ciphers - MIT License (c) 2023 Paul Miller (paulmillr.com) *)
+*/
+</script>
+<script>
+(() => {
+  // ---------- State ----------
+  const DEFAULT_CATS = ["Work","Markets","Personal","People","Health","World"];
+  let preds = {};          // id -> prediction
+  let meta = { cats: DEFAULT_CATS.slice(), reviews: [] };
+  let editingId = null;
+  let histFilter = "open";
+
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const pad = n => String(n).padStart(2,"0");
+  const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const today = () => ymd(new Date());
+  const addDays = (n) => { const d = new Date(); d.setDate(d.getDate()+n); return ymd(d); };
+  const fmtDate = s => { if(!s) return ""; const [y,m,d] = s.split("-").map(Number); return new Date(y,m-1,d).toLocaleDateString(undefined,{month:"short",day:"numeric"}); };
+  const daysUntil = s => { const [y,m,d] = s.split("-").map(Number); const t = new Date(y,m-1,d); const n = new Date(); n.setHours(0,0,0,0); return Math.round((t-n)/86400000); };
+  const uid = () => "p" + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+
+  function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("on"),1800); }
+
+  // ---------- Local fallback ----------
+  function lsLoad(){
+    try{
+      const raw = localStorage.getItem("pj-data");
+      if(raw){ const o = JSON.parse(raw); preds = o.preds || {}; meta = Object.assign(meta, o.meta || {}); }
+    }catch(e){}
+  }
+  function lsSave(){ try{ localStorage.setItem("pj-data", JSON.stringify({preds, meta})); }catch(e){} }
+
+  // ---------- Persistence (device first, then relays) ----------
+  async function savePred(p){
+    p = Object.assign({}, p, { updated: Date.now() });
+    preds[p.id] = p; lsSave(); render(); markDirty(predD(p.id));
+  }
+  async function deletePred(id){
+    preds[id] = { id, deleted: true, updated: Date.now() };   // tombstone so other devices drop it too
+    lsSave(); render(); markDirty(predD(id));
+  }
+  function saveMeta(){ meta.updated = Date.now(); lsSave(); render(); markDirty(META_D); }
+
+  // ---------- Nostr: login + encrypted relay storage ----------
+  // NIP-01 events/relays, NIP-78 app data (kind 30078, addressable), NIP-44 encryption to self, NIP-07 extension login.
+  const NT = window.NT;
+  const KIND = 30078, APP_TAG = "prediction-journal", DPRE = "pj1:", META_D = DPRE + "meta";
+  const DEFAULT_RELAYS = ["wss://relay.damus.io","wss://nos.lol","wss://relay.primal.net","wss://nostr.mom"];
+  const ns = { mode:null, pk:null, sk:null, ck:null, relays:DEFAULT_RELAYS.slice(), remember:true, lastSync:null, status:"", showKey:false, fresh:false };
+  const relayState = {}, lastTs = {}, evCache = {}, dirty = new Set();
+  let pubTimer = null, syncing = false, syncAgain = false;
+  const tsUse = { t:0, n:0 };
+
+  const rs = url => relayState[url] || (relayState[url] = {ws:null,state:"idle",msg:"",subs:{},oks:{},connecting:null});
+  function persistNostr(){
+    const o = { mode:ns.mode, relays:ns.relays, remember:ns.remember, lastSync:ns.lastSync };
+    if(ns.mode === "local" && ns.remember && ns.sk) o.nsec = NT.nip19.nsecEncode(ns.sk);
+    try{ localStorage.setItem("pj-nostr", JSON.stringify(o)); }catch(e){}
+  }
+  function setStatus(m){ ns.status = m; renderNostrStatus(); }
+
+  function connect(url){
+    const r = rs(url);
+    if(r.ws && r.ws.readyState === 1) return Promise.resolve(r);
+    if(r.connecting) return r.connecting;
+    if(r.failAt && Date.now() - r.failAt < 30000) return Promise.reject(new Error(r.msg || "Can't connect"));   // don't stall saves on a dead relay
+    r.state = "connecting"; renderNostrStatus();
+    r.connecting = new Promise((res, rej) => {
+      let ws, done = false;
+      const fail = m => { if(done) return; done = true; clearTimeout(t); r.state = "error"; r.msg = m; r.failAt = Date.now(); r.connecting = null; renderNostrStatus(); rej(new Error(m)); };
+      const t = setTimeout(() => { try{ ws && ws.close(); }catch(e){} fail("Timed out"); }, 8000);
+      try{ ws = new WebSocket(url); }catch(e){ return fail("Blocked or invalid address"); }
+      ws.onopen = () => { if(done) return; done = true; clearTimeout(t); r.ws = ws; r.state = "open"; r.msg = ""; r.connecting = null; renderNostrStatus(); res(r); };
+      ws.onerror = () => fail("Can't connect");
+      ws.onclose = () => {
+        if(!done) return fail("Can't connect");
+        if(r.ws === ws){ r.ws = null; if(r.state === "open") r.state = "idle";
+          Object.values(r.subs).forEach(s => { s.err = s.err || "closed"; s.finish(); });
+          Object.values(r.oks).forEach(f => f(false, "connection closed")); renderNostrStatus(); }
+      };
+      ws.onmessage = m => {
+        let d; try{ d = JSON.parse(m.data); }catch(e){ return; }
+        if(!Array.isArray(d)) return;
+        if(d[0] === "EVENT" && r.subs[d[1]]) r.subs[d[1]].events.push(d[2]);
+        else if(d[0] === "EOSE" && r.subs[d[1]]) r.subs[d[1]].finish();
+        else if(d[0] === "CLOSED" && r.subs[d[1]]){ r.subs[d[1]].err = String(d[2] || "closed"); r.subs[d[1]].finish(); }
+        else if(d[0] === "OK" && r.oks[d[1]]) r.oks[d[1]](!!d[2], String(d[3] || ""));
+      };
+    });
+    return r.connecting;
+  }
+  async function relayReq(url, filter){
+    const r = await connect(url); const id = "pj" + Math.random().toString(36).slice(2,10);
+    return new Promise(res => {
+      const sub = { events:[], err:null, finish(){ clearTimeout(t); if(!r.subs[id]) return; delete r.subs[id]; try{ r.ws && r.ws.send(JSON.stringify(["CLOSE",id])); }catch(e){} res(sub); } };
+      const t = setTimeout(() => { sub.err = "timeout"; sub.finish(); }, 10000);
+      r.subs[id] = sub;
+      try{ r.ws.send(JSON.stringify(["REQ", id, filter])); }catch(e){ sub.err = "send failed"; sub.finish(); }
+    });
+  }
+  async function relayPub(url, ev){
+    const r = await connect(url);
+    return new Promise(res => {
+      const t = setTimeout(() => { delete r.oks[ev.id]; res({ok:false,msg:"timeout"}); }, 8000);
+      r.oks[ev.id] = (ok, msg) => { clearTimeout(t); delete r.oks[ev.id]; res({ok: ok || /^duplicate/.test(msg), msg}); };
+      try{ r.ws.send(JSON.stringify(["EVENT", ev])); }catch(e){ clearTimeout(t); delete r.oks[ev.id]; res({ok:false,msg:"send failed"}); }
+    });
+  }
+
+  const enc = async t => ns.mode === "ext" ? window.nostr.nip44.encrypt(ns.pk, t) : NT.nip44.v2.encrypt(t, ns.ck);
+  const dec = async c => ns.mode === "ext" ? window.nostr.nip44.decrypt(ns.pk, c) : NT.nip44.v2.decrypt(c, ns.ck);
+  const sign = async tpl => ns.mode === "ext" ? window.nostr.signEvent(tpl) : NT.finalizeEvent(tpl, ns.sk);
+  const predD = id => DPRE + "p:" + id;
+  const objFor = d => d === META_D ? meta : preds[d.slice(DPRE.length + 2)];
+  const localDs = () => [META_D].concat(Object.keys(preds).map(predD));
+  async function buildEvent(d){
+    const obj = objFor(d); if(!obj) return null;
+    let ts = Math.max(Math.floor(Date.now()/1000), (lastTs[d] || 0) + 1, tsUse.t);
+    // Keep at most 10 events per second so relay paging (newest-first, by second) never hides entries.
+    if(ts === tsUse.t){ if(tsUse.n >= 10){ ts++; tsUse.t = ts; tsUse.n = 1; } else tsUse.n++; } else { tsUse.t = ts; tsUse.n = 1; }
+    lastTs[d] = ts;
+    return sign({ kind:KIND, created_at:ts, tags:[["d",d],["t",APP_TAG]], content: await enc(JSON.stringify(obj)) });
+  }
+  function markDirty(d){ if(!ns.pk) return; dirty.add(d); clearTimeout(pubTimer); pubTimer = setTimeout(flush, 500); }
+
+  async function flush(){
+    if(!ns.pk || !dirty.size) return;
+    if(syncing){ syncAgain = true; return; }
+    const ds = [...dirty]; dirty.clear(); setStatus("Saving to relays…");
+    let best = 0, failed = false;
+    for(const d of ds){
+      let ev; try{ ev = await buildEvent(d); }catch(e){ failed = true; toast("Couldn't encrypt: " + (e.message || e)); continue; }
+      if(!ev) continue;
+      const res = await Promise.all(ns.relays.map(u => relayPub(u, ev).catch(e => ({ok:false,msg:e.message}))));
+      res.forEach((x,i) => { if(!x.ok && x.msg && rs(ns.relays[i]).state === "open") rs(ns.relays[i]).msg = x.msg; });
+      const n = res.filter(x => x.ok).length; if(!n) failed = true; best = Math.max(best, n);
+    }
+    if(failed && !best) setStatus("Not saved to any relay yet. Kept on this device; will retry on next sync.");
+    else { ns.lastSync = Date.now(); persistNostr(); setStatus(`Saved to ${best} of ${ns.relays.length} relays`); }
+  }
+
+  async function pullRelay(url){
+    const have = {}, items = [], seen = new Set(); let until = null, complete = true;
+    for(let page = 0; page < 40; page++){
+      const f = { kinds:[KIND], authors:[ns.pk], "#t":[APP_TAG], limit:300 }; if(until !== null) f.until = until;
+      const sub = await relayReq(url, f);
+      if(sub.err){ complete = false; rs(url).msg = "Read failed: " + sub.err; break; }
+      let minTs = Infinity, fresh = 0;
+      for(const ev of sub.events){
+        if(!ev || ev.kind !== KIND || ev.pubkey !== ns.pk || typeof ev.id !== "string" || seen.has(ev.id)) continue;
+        seen.add(ev.id); fresh++; minTs = Math.min(minTs, ev.created_at);
+        let c = evCache[ev.id];
+        if(!c){
+          const d = ((ev.tags || []).find(t => t[0] === "d") || [])[1];
+          if(!d || !d.startsWith(DPRE)) continue;
+          let ok = false; try{ ok = NT.verifyEvent(ev); }catch(e){}
+          if(!ok) continue;
+          try{ c = evCache[ev.id] = { d, obj: JSON.parse(await dec(ev.content)), ts: ev.created_at }; }catch(e){ continue; }
+        }
+        items.push(c); have[c.d] = Math.max(have[c.d] ?? -1, c.obj.updated || 0);
+      }
+      if(!fresh){
+        // A full page of already-seen events sharing one timestamp: step past that second.
+        if(until !== null && sub.events.length && sub.events.every(ev => ev && ev.created_at === until)){ until = until - 1; continue; }
+        break;
+      }
+      until = minTs;
+    }
+    return { items, have, complete };
+  }
+  function applyRemote(d, obj){
+    if(!obj || typeof obj !== "object") return false;
+    if(d === META_D){
+      if((obj.updated || 0) <= (meta.updated || 0)) return false;
+      meta = { cats: Array.isArray(obj.cats) && obj.cats.length ? obj.cats : DEFAULT_CATS.slice(), reviews: Array.isArray(obj.reviews) ? obj.reviews : [], theme: obj.theme || "pista", updated: obj.updated };
+      return true;
+    }
+    if(!d.startsWith(DPRE + "p:")) return false;
+    const id = d.slice(DPRE.length + 2), loc = preds[id];
+    if(loc && (obj.updated || 0) <= (loc.updated || 0)) return false;
+    preds[id] = Object.assign({}, obj, { id }); return true;
+  }
+  async function syncNow(){
+    if(!ns.pk) return;
+    if(syncing){ syncAgain = true; return; }
+    syncing = true; setStatus("Syncing…");
+    try{
+      const results = await Promise.all(ns.relays.map(async url => { try{ return Object.assign({url}, await pullRelay(url)); }catch(e){ return {url, fail:true}; } }));
+      let changed = false;
+      for(const r of results){ if(r.fail) continue; for(const it of r.items){ lastTs[it.d] = Math.max(lastTs[it.d] || 0, it.ts); if(applyRemote(it.d, it.obj)) changed = true; } }
+      if(changed){ lsSave(); applyTheme(meta.theme || "pista"); render(); }
+      // Push anything a relay is missing or holds an older copy of (only after a complete read of that relay).
+      const built = {}; let okRelays = 0, pushed = 0;
+      for(const r of results){
+        if(r.fail || !r.complete) continue; okRelays++;
+        for(const d of localDs()){
+          const obj = objFor(d), u = obj.updated || 0;
+          if(d === META_D && !u) continue;
+          if(r.have[d] !== undefined && r.have[d] >= u) continue;
+          try{ built[d] = built[d] || await buildEvent(d); }catch(e){ continue; }
+          const x = await relayPub(r.url, built[d]).catch(e => ({ok:false,msg:e.message}));
+          if(x.ok) pushed++; else if(x.msg) rs(r.url).msg = x.msg;
+        }
+      }
+      if(okRelays){ ns.lastSync = Date.now(); persistNostr(); setStatus(`Synced with ${okRelays} of ${ns.relays.length} relays`); }
+      else setStatus("Couldn't reach any relay. Your journal is still saved on this device.");
+    } finally {
+      syncing = false;
+      if(syncAgain || dirty.size){ syncAgain = false; if(dirty.size) flush(); else syncNow(); }
+    }
+  }
+
+  function setLocalKey(sk){ ns.mode = "local"; ns.sk = sk; ns.pk = NT.getPublicKey(sk); ns.ck = NT.nip44.v2.utils.getConversationKey(sk, ns.pk); }
+  function afterLogin(){ persistNostr(); renderNostr(); render(); syncNow(); }
+  function parseKey(v){
+    v = v.trim();
+    if(/^[0-9a-f]{64}$/i.test(v)) return Uint8Array.from(v.match(/../g).map(h => parseInt(h,16)));
+    if(/^npub1/.test(v)) throw new Error("That's a public key (npub). Paste the secret key that starts with nsec1.");
+    const d = NT.nip19.decode(v); if(d.type !== "nsec") throw new Error("Not a secret key"); return d.data;
+  }
+  function logout(){
+    Object.values(relayState).forEach(r => { try{ r.ws && r.ws.close(); }catch(e){} });
+    Object.keys(relayState).forEach(k => delete relayState[k]);
+    ns.mode = ns.pk = ns.sk = ns.ck = null; ns.status = ""; ns.showKey = false; ns.fresh = false; dirty.clear();
+    persistNostr(); renderNostr(); render();
+  }
+
+  const shortKey = k => k.slice(0,12) + "…" + k.slice(-6);
+  function renderNostr(){
+    const box = $("#nostr-box"); if(!box) return;
+    if(!ns.pk){
+      box.innerHTML = `
+        <p class="tip" style="margin-top:0">Log in with a Nostr key to store your journal on relays you choose. Every entry is encrypted with your key before it leaves this device, so relays can't read it.</p>
+        <button class="btn" id="n-create" style="margin-top:14px">Create a new key</button>
+        <label for="n-nsec">Or use a key you already have</label>
+        <div class="row"><input id="n-nsec" type="password" placeholder="nsec1…" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="link dark" id="n-login">Log in</button></div>
+        ${window.nostr ? `<button class="link" id="n-ext" style="margin-top:12px">Use browser extension</button>` : ""}
+        <label class="check"><input type="checkbox" id="n-remember" ${ns.remember ? "checked" : ""}> Remember key on this device</label>
+        <p class="tip">Best practice: use a key made only for this journal, not your main Nostr identity.</p>`;
+      $("#n-create").onclick = () => { ns.remember = $("#n-remember").checked; setLocalKey(NT.generateSecretKey()); ns.fresh = true; ns.showKey = true; afterLogin(); toast("Key created — save it now"); };
+      $("#n-login").onclick = () => { try{ const sk = parseKey($("#n-nsec").value); ns.remember = $("#n-remember").checked; setLocalKey(sk); afterLogin(); toast("Logged in"); }catch(e){ toast(e.message && e.message.length < 90 ? e.message : "That key isn't valid"); } };
+      const ext = $("#n-ext"); if(ext) ext.onclick = async () => {
+        try{ if(!window.nostr.nip44) throw new Error("Extension lacks NIP-44 encryption"); const pk = await window.nostr.getPublicKey(); ns.mode = "ext"; ns.pk = pk; ns.sk = ns.ck = null; afterLogin(); toast("Logged in"); }
+        catch(e){ toast(e.message || "Extension login failed"); }
+      };
+      return;
+    }
+    const npub = NT.nip19.npubEncode(ns.pk), nsec = ns.sk ? NT.nip19.nsecEncode(ns.sk) : "";
+    box.innerHTML = `
+      <div class="row between"><div><div class="sub">Logged in as</div><div class="mono">${shortKey(npub)}</div></div><button class="link" id="n-copy-npub">Copy npub</button></div>
+      ${ns.sk ? `<div class="keybox ${ns.fresh ? "warn" : ""}">
+        ${ns.fresh ? `<b>Save your secret key now.</b> It's the only way to restore your journal on another device. Anyone who has it can read your journal. Keep it in a password manager.` : `<b>Secret key</b>`}
+        ${ns.showKey ? `<div class="mono wrapkey" id="n-nsec-show">${nsec}</div>` : ""}
+        <div class="row" style="margin-top:10px;gap:8px"><button class="link dark" id="n-copy-nsec">Copy secret key</button><button class="link" id="n-toggle-key">${ns.showKey ? "Hide" : "Show"}</button></div>
+        ${ns.remember ? "" : `<p class="tip">Not remembered on this device. You'll need to paste it again next time.</p>`}
+      </div>` : `<p class="tip">Signing and encryption are handled by your browser extension.</p>`}
+      <div class="row between" style="margin-top:16px"><div class="sub" id="n-status"></div><button class="link dark" id="n-sync">Sync now</button></div>
+      <label>Relays</label>
+      <div id="n-relays"></div>
+      <div class="row" style="margin-top:10px"><input id="n-new-relay" placeholder="wss://relay.example.com" autocapitalize="off" spellcheck="false"><button class="link dark" id="n-add-relay">Add</button></div>
+      <div class="row" style="margin-top:16px"><button class="link" id="n-logout" style="margin-left:auto">Log out</button></div>`;
+    $("#n-copy-npub").onclick = () => copySecret(npub, "npub copied");
+    if(ns.sk){
+      $("#n-copy-nsec").onclick = async () => { const ok = await copySecret(nsec, "Secret key copied"); if(!ok){ ns.showKey = true; renderNostr(); } };
+      $("#n-toggle-key").onclick = () => { ns.showKey = !ns.showKey; renderNostr(); };
+    }
+    $("#n-sync").onclick = () => { Object.values(relayState).forEach(r => { r.failAt = 0; }); syncNow(); };
+    $("#n-add-relay").onclick = () => {
+      let v = $("#n-new-relay").value.trim().replace(/\/+$/,"");
+      if(!/^wss?:\/\/[^\s/]+/.test(v)) return toast("Relay address must start with wss://");
+      if(ns.relays.includes(v)) return toast("Already added");
+      ns.relays.push(v); persistNostr(); renderNostr(); syncNow();
+    };
+    $("#n-logout").onclick = e => { const b = e.currentTarget; if(b.dataset.c){ logout(); toast("Logged out — journal kept on this device"); } else { b.dataset.c = "1"; b.textContent = ns.sk ? "Tap again — is your key saved?" : "Tap again to log out"; } };
+    renderNostrStatus();
+  }
+  async function copySecret(text, msg){ try{ await navigator.clipboard.writeText(text); toast(msg); return true; }catch(e){ toast("Copy blocked — select and copy it manually"); return false; } }
+  function renderNostrStatus(){
+    const note = $("#storage-note");
+    if(note) note.textContent = ns.pk ? (ns.status || "Encrypted relay storage is on") : "Stored on this device only. Turn on Nostr sync above to back it up.";
+    const st = $("#n-status"); if(st) st.textContent = ns.status || (ns.lastSync ? "Last synced " + new Date(ns.lastSync).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}) : "Not synced yet");
+    const el = $("#n-relays"); if(!el) return;
+    el.innerHTML = ns.relays.map(u => { const r = rs(u); const c = r.state === "open" ? "var(--good)" : r.state === "error" ? "var(--bad)" : "var(--hair)";
+      return `<div class="relay"><span class="dot" style="background:${c}"></span><div class="grow"><div class="mono">${esc(u.replace(/^wss?:\/\//,""))}</div>${r.msg ? `<div class="sub">${esc(r.msg.slice(0,80))}</div>` : ""}</div><button class="link" data-rm-relay="${esc(u)}" aria-label="Remove relay">×</button></div>`; }).join("") || `<div class="empty">No relays. Add at least one.</div>`;
+  }
+  document.addEventListener("click", e => {
+    const b = e.target.closest("[data-rm-relay]"); if(!b) return;
+    const u = b.dataset.rmRelay; ns.relays = ns.relays.filter(x => x !== u); try{ rs(u).ws && rs(u).ws.close(); }catch(err){} delete relayState[u]; persistNostr(); renderNostrStatus();
+  });
+  function initNostr(){
+    let o = null; try{ o = JSON.parse(localStorage.getItem("pj-nostr") || "null"); }catch(e){}
+    if(o){
+      if(Array.isArray(o.relays)) ns.relays = o.relays.filter(u => typeof u === "string" && /^wss?:\/\//.test(u));
+      ns.remember = o.remember !== false; ns.lastSync = o.lastSync || null;
+      if(o.nsec){ try{ setLocalKey(parseKey(o.nsec)); }catch(e){} }
+      else if(o.mode === "ext"){ let n = 0; const tryExt = async () => { if(window.nostr && window.nostr.nip44){ try{ ns.pk = await window.nostr.getPublicKey(); ns.mode = "ext"; renderNostr(); render(); syncNow(); }catch(e){} } else if(n++ < 10) setTimeout(tryExt, 300); }; tryExt(); }
+    }
+    renderNostr();
+    if(ns.pk) syncNow();
+    else if(!window.nostr) setTimeout(() => { if(!ns.pk && window.nostr) renderNostr(); }, 1200);
+  }
+  window.addEventListener("online", () => syncNow());
+
+  // ---------- Derived ----------
+  const list = () => Object.values(preds).filter(p => !p.deleted).sort((a,b) => (b.created||"").localeCompare(a.created||""));
+  const isOpen = p => !p.outcome;
+  const isDue = p => isOpen(p) && p.due && p.due <= today();
+  const scored = () => list().filter(p => p.outcome === "yes" || p.outcome === "no");
+
+  function streak(){
+    const days = new Set(list().map(p => (p.createdDay || (p.created||"").slice(0,10))));
+    let n = 0; const d = new Date();
+    if(!days.has(ymd(d))) d.setDate(d.getDate()-1);
+    while(days.has(ymd(d))){ n++; d.setDate(d.getDate()-1); }
+    return n;
+  }
+  function madeToday(){ return list().some(p => (p.createdDay || (p.created||"").slice(0,10)) === today()); }
+
+  function brier(arr){ if(!arr.length) return null; return arr.reduce((s,p) => s + Math.pow(p.conf/100 - (p.outcome==="yes"?1:0), 2), 0) / arr.length; }
+
+  const BUCKETS = [[50,59],[60,69],[70,79],[80,89],[90,99]];
+  function buckets(arr){
+    return BUCKETS.map(([lo,hi]) => {
+      const inB = arr.filter(p => p.conf >= lo && p.conf <= hi);
+      const hits = inB.filter(p => p.outcome === "yes").length;
+      const avg = inB.length ? inB.reduce((s,p)=>s+p.conf,0)/inB.length : (lo+hi)/2;
+      return { lo, hi, n: inB.length, rate: inB.length ? hits/inB.length*100 : null, avg };
+    });
+  }
+
+  // ---------- Render ----------
+  function itemHTML(p, actions){
+    let status = "";
+    if(p.outcome === "yes") status = `<span class="tag yes">Right</span>`;
+    else if(p.outcome === "no") status = `<span class="tag no">Wrong</span>`;
+    else if(p.outcome === "void") status = `<span class="tag">Void</span>`;
+    else if(isDue(p)) status = `<span class="tag due">Due</span>`;
+    const dd = p.due ? daysUntil(p.due) : null;
+    const du = p.due && isOpen(p) ? (dd > 0 ? `in ${dd}d` : dd === 0 ? "today" : `${-dd}d overdue`) : fmtDate(p.due);
+    return `<div class="item" data-id="${p.id}">
+      <div class="open-item"><div class="t">${esc(p.text)}</div>
+      <div class="meta"><span class="c">${p.conf}%</span>${p.cat?`<span>${esc(p.cat)}</span>`:""}<span>${du}</span>${status}</div></div>
+      ${actions ? `<div class="acts">
+        <button class="yes" data-act="yes">✓ Right</button>
+        <button class="no" data-act="no">✕ Wrong</button>
+        <button class="void" data-act="void">Void</button>
+        <button class="snooze" data-act="snooze">+3 days</button>
+      </div>` : ""}
+    </div>`;
+  }
+
+  function render(){
+    const now = new Date();
+    $("#today-label").textContent = now.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"});
+    $("#streak").textContent = streak();
+
+    // banners
+    const due = list().filter(isDue).sort((a,b)=>a.due.localeCompare(b.due));
+    let b = "";
+    if(due.length) b += `<div class="notice warn"><span class="dot"></span>${due.length} prediction${due.length>1?"s":""} ready to score</div>`;
+    if(!ns.pk && list().length) b += `<div class="notice info"><span class="dot"></span>Only on this device. Turn on Nostr sync in More.</div>`;
+    if(madeToday()) b += `<div class="notice ok"><span class="dot"></span>Today's prediction is logged</div>`;
+    else if(list().length === 0) b += `<div class="notice info"><span class="dot"></span>Your first prediction starts the streak</div>`;
+    $("#banners").innerHTML = b;
+    $("#nav-badge").innerHTML = due.length ? `<span class="badge">${due.length}</span>` : "";
+
+    $("#due-count").textContent = due.length ? `${due.length} waiting` : "";
+    $("#due-list").innerHTML = due.length ? due.map(p => itemHTML(p, true)).join("") : `<div class="empty">Nothing to score yet</div>`;
+
+    const up = list().filter(p => isOpen(p) && !isDue(p)).sort((a,b)=>(a.due||"").localeCompare(b.due||"")).slice(0,5);
+    $("#upcoming-list").innerHTML = up.length ? up.map(p => itemHTML(p,false)).join("") : `<div class="empty">No open predictions</div>`;
+
+    // categories select
+    const sel = $("#f-cat"); const cur = sel.value;
+    sel.innerHTML = meta.cats.map(c => `<option>${esc(c)}</option>`).join("");
+    if(meta.cats.includes(cur)) sel.value = cur;
+    $("#cat-manage").innerHTML = meta.cats.map(c => `<span class="chip cat-chip">${esc(c)}<a data-del-cat="${esc(c)}" aria-label="Remove">×</a></span>`).join("");
+
+    renderHistory();
+    renderStats();
+    $("#review-list").innerHTML = (meta.reviews||[]).slice().reverse().slice(0,8).map(r => `<div class="insight"><div class="sub">${fmtDate(r.day)}</div>${esc(r.text).replace(/\n/g,"<br>")}</div>`).join("");
+    renderNostrStatus();
+  }
+
+  function renderHistory(){
+    const q = $("#search").value.trim().toLowerCase();
+    let arr = list();
+    if(histFilter === "open") arr = arr.filter(isOpen);
+    if(histFilter === "resolved") arr = arr.filter(p => !isOpen(p));
+    if(q) arr = arr.filter(p => (p.text+" "+(p.note||"")+" "+(p.cat||"")).toLowerCase().includes(q));
+    $("#hist-list").innerHTML = arr.length ? arr.map(p => itemHTML(p,false)).join("") : `<div class="empty">Nothing here yet</div>`;
+  }
+
+  function renderStats(){
+    const all = list(), sc = scored();
+    const hits = sc.filter(p=>p.outcome==="yes").length;
+    const br = brier(sc);
+    $("#s-total").textContent = all.length;
+    $("#s-resolved").textContent = sc.length;
+    $("#s-hit").textContent = sc.length ? Math.round(hits/sc.length*100)+"%" : "–";
+    $("#s-brier").textContent = br==null ? "–" : br.toFixed(2);
+
+    // calibration chart
+    const bk = buckets(sc);
+    const W=320,H=240,L=36,R=12,T=12,B=34;
+    const x = v => L + (v-50)/50*(W-L-R);
+    const y = v => T + (100-v)/100*(H-T-B);
+    let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:480px;display:block;margin:0 auto;font:11px Inter,sans-serif">`;
+    for(let v=0; v<=100; v+=25) svg += `<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--hair)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" fill="var(--muted)">${v}%</text>`;
+    for(let v=50; v<=100; v+=10) svg += `<text x="${x(v)}" y="${H-B+16}" text-anchor="middle" fill="var(--muted)">${v}%</text>`;
+    svg += `<text x="${(L+W-R)/2}" y="${H-4}" text-anchor="middle" fill="var(--muted)">Your confidence</text>`;
+    svg += `<line x1="${x(50)}" y1="${y(50)}" x2="${x(100)}" y2="${y(100)}" stroke="var(--muted)" stroke-dasharray="4 4"/>`;
+    const pts = bk.filter(b=>b.n);
+    if(pts.length>1) svg += `<polyline fill="none" stroke="var(--accent)" stroke-width="3" points="${pts.map(b=>`${x(b.avg)},${y(b.rate)}`).join(" ")}"/>`;
+    pts.forEach(b => { const r = Math.min(4+b.n, 12); svg += `<circle cx="${x(b.avg)}" cy="${y(b.rate)}" r="${r}" fill="var(--accent)" stroke="var(--card)" stroke-width="2"><title>${b.lo}–${b.hi}%: right ${Math.round(b.rate)}% of ${b.n}</title></circle>`; });
+    svg += `</svg>`;
+    let table = `<div style="margin-top:10px">` + bk.map(b => `<div class="row" style="font-size:13px;padding:4px 0"><span style="width:64px;color:var(--muted)">${b.lo}–${b.hi}%</span><div class="bar grow"><i style="width:${b.rate??0}%"></i></div><span style="width:92px;text-align:right">${b.n? Math.round(b.rate)+"% of "+b.n : "—"}</span></div>`).join("") + `</div>`;
+    $("#calib").innerHTML = sc.length ? svg + table : `<div class="empty">Score a few predictions to see your calibration</div>`;
+
+    // insights
+    const ins = [];
+    if(sc.length < 10) ins.push(`You have ${sc.length} scored prediction${sc.length===1?"":"s"}. Patterns become meaningful around 20–30, so keep going.`);
+    bk.filter(b=>b.n>=4).forEach(b => {
+      const gap = b.rate - b.avg;
+      if(gap <= -12) ins.push(`<b>Overconfident at ${b.lo}–${b.hi}%:</b> you average ${Math.round(b.avg)}% confidence but are right ${Math.round(b.rate)}% of the time. Try dialing these down.`);
+      else if(gap >= 12) ins.push(`<b>Underconfident at ${b.lo}–${b.hi}%:</b> right ${Math.round(b.rate)}% of the time at ${Math.round(b.avg)}% confidence. You can trust your read more here.`);
+      else ins.push(`<b>Well calibrated at ${b.lo}–${b.hi}%</b> (${Math.round(b.rate)}% right vs ${Math.round(b.avg)}% stated).`);
+    });
+    const cats = {};
+    sc.forEach(p => { const c = p.cat||"Other"; (cats[c] = cats[c]||[]).push(p); });
+    const catB = Object.entries(cats).filter(([,a])=>a.length>=4).map(([c,a])=>[c,brier(a),a.length]).sort((a,b)=>a[1]-b[1]);
+    if(catB.length >= 2){
+      ins.push(`<b>Best judgment:</b> ${esc(catB[0][0])} (Brier ${catB[0][1].toFixed(2)}). <b>Weakest:</b> ${esc(catB[catB.length-1][0])} (Brier ${catB[catB.length-1][1].toFixed(2)}).`);
+    }
+    const overdue = list().filter(p => isDue(p) && daysUntil(p.due) < -7).length;
+    if(overdue) ins.push(`${overdue} prediction${overdue>1?"s are":" is"} more than a week overdue for scoring. Unscored predictions are where hindsight bias sneaks back in.`);
+    $("#insights").innerHTML = ins.map(s=>`<div class="insight">${s}</div>`).join("");
+
+    // by category
+    const rows = Object.entries(cats).sort((a,b)=>b[1].length-a[1].length);
+    $("#by-cat").innerHTML = rows.length ? rows.map(([c,a]) => {
+      const h = a.filter(p=>p.outcome==="yes").length;
+      return `<div class="row" style="font-size:14px;padding:6px 0"><span class="grow">${esc(c)}</span><span class="sub" style="width:70px">${a.length} scored</span><span style="width:52px;text-align:right">${Math.round(h/a.length*100)}%</span><span class="sub" style="width:60px;text-align:right">B ${brier(a).toFixed(2)}</span></div>`;
+    }).join("") : `<div class="empty">No scored predictions yet</div>`;
+  }
+
+  // ---------- Sheet (detail) ----------
+  function openSheet(id){
+    const p = preds[id]; if(!p) return;
+    const out = p.outcome ? {yes:"Right",no:"Wrong",void:"Void"}[p.outcome] : "Open";
+    $("#sheet").innerHTML = `
+      <div class="grip"></div>
+      <div class="row between"><h2 style="margin:0">Prediction</h2><button class="link" id="sh-close">Close</button></div>
+      <p style="font-size:19px;font-weight:600;letter-spacing:-.01em;margin:12px 0 6px">${esc(p.text)}</p>
+      <div class="meta"><span class="c">${p.conf}%</span><span>${esc(p.cat||"")}</span><span>made ${fmtDate((p.created||"").slice(0,10))}</span><span>due ${fmtDate(p.due)}</span><span class="tag ${p.outcome||""}">${out}</span></div>
+      ${p.note?`<label>Reasoning</label><div style="font-size:14px">${esc(p.note).replace(/\n/g,"<br>")}</div>`:""}
+      <label for="sh-ref">What I learned</label>
+      <textarea id="sh-ref" placeholder="Why was I right or wrong?">${esc(p.reflection||"")}</textarea>
+      <div class="acts" style="margin-top:16px">
+        <button class="yes" data-o="yes">✓ Right</button>
+        <button class="no" data-o="no">✕ Wrong</button>
+        <button class="void" data-o="void">Void</button>
+        ${p.outcome?`<button class="void" data-o="">Reopen</button>`:""}
+      </div>
+      <div class="row" style="margin-top:22px;gap:8px">
+        <button class="link" id="sh-save">Save note</button>
+        <button class="link" id="sh-edit">Edit</button>
+        <button class="link" id="sh-del" style="margin-left:auto">Delete</button>
+      </div>`;
+    $("#sheet-bg").classList.add("on");
+    $("#sh-close").onclick = closeSheet;
+    $("#sh-save").onclick = () => { savePred(Object.assign({}, p, {reflection: $("#sh-ref").value.trim()})); toast("Saved"); };
+    $("#sheet").querySelectorAll("[data-o]").forEach(b => b.onclick = () => {
+      const o = b.dataset.o || null;
+      savePred(Object.assign({}, p, {outcome:o, resolvedAt: o?new Date().toISOString():null, reflection:$("#sh-ref").value.trim()}));
+      closeSheet(); toast(o ? "Scored" : "Reopened");
+    });
+    $("#sh-edit").onclick = () => { closeSheet(); startEdit(id); };
+    $("#sh-del").onclick = () => {
+      const btn = $("#sh-del");
+      if(btn.dataset.confirm){ deletePred(id); closeSheet(); toast("Deleted"); }
+      else { btn.dataset.confirm = "1"; btn.textContent = "Tap again to delete"; }
+    };
+  }
+  function closeSheet(){ $("#sheet-bg").classList.remove("on"); }
+  $("#sheet-bg").addEventListener("click", e => { if(e.target.id === "sheet-bg") closeSheet(); });
+
+  // ---------- Form ----------
+  const STARTERS = [
+    "I finish ___ by ___",
+    "___ replies to me within 48 hours",
+    "A stock I follow closes higher this week",
+    "The meeting about ___ ends with a decision",
+    "I hit my workout goal this week",
+    "___ happens in the news by month end"
+  ];
+  $("#starters").innerHTML = STARTERS.map(s => `<button class="chip" data-s="${esc(s)}">${esc(s)}</button>`).join("");
+  $("#starters").addEventListener("click", e => { const b = e.target.closest("[data-s]"); if(!b) return; $("#f-text").value = b.dataset.s; $("#f-text").focus(); });
+
+  $("#conf-chips").innerHTML = [60,70,80,90,95].map(v => `<button class="chip" data-c="${v}">${v}%</button>`).join("");
+  $("#conf-chips").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if(!b) return; $("#f-conf").value = b.dataset.c; syncConf(); });
+  function syncConf(){
+    const v = +$("#f-conf").value; $("#conf-out").textContent = v + "%";
+    $("#conf-chips").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", +c.dataset.c === v));
+  }
+  $("#f-conf").addEventListener("input", syncConf);
+
+  const DUE_OPTS = [["Tomorrow",1],["3 days",3],["1 week",7],["1 month",30],["3 months",90]];
+  $("#due-chips").innerHTML = DUE_OPTS.map(([l,n]) => `<button class="chip" data-d="${n}">${l}</button>`).join("");
+  $("#due-chips").addEventListener("click", e => { const b = e.target.closest("[data-d]"); if(!b) return; $("#f-due").value = addDays(+b.dataset.d); });
+
+  function resetForm(){
+    editingId = null;
+    $("#f-text").value = ""; $("#f-note").value = ""; $("#f-conf").value = 70; $("#f-due").value = addDays(7);
+    $("#form-title").textContent = madeToday() ? "Another prediction" : "Today's prediction";
+    $("#save-btn").textContent = "Save prediction";
+    syncConf();
+  }
+  function startEdit(id){
+    const p = preds[id]; if(!p) return;
+    editingId = id; show("today");
+    $("#f-text").value = p.text; $("#f-note").value = p.note||""; $("#f-conf").value = p.conf; $("#f-due").value = p.due; $("#f-cat").value = p.cat;
+    $("#form-title").textContent = "Edit prediction"; $("#save-btn").textContent = "Update prediction";
+    syncConf(); window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  $("#save-btn").addEventListener("click", () => {
+    const text = $("#f-text").value.trim();
+    if(!text){ toast("Write a prediction first"); $("#f-text").focus(); return; }
+    if(/___/.test(text)){ toast("Fill in the blanks"); return; }
+    const due = $("#f-due").value || addDays(7);
+    if(!editingId && due < today()){ toast("Pick a date in the future"); return; }
+    const base = editingId ? preds[editingId] : { id: uid(), created: new Date().toISOString(), createdDay: today(), outcome: null };
+    savePred(Object.assign({}, base, { text, conf: +$("#f-conf").value, due, cat: $("#f-cat").value, note: $("#f-note").value.trim() }));
+    toast(editingId ? "Updated" : "Prediction saved");
+    resetForm();
+  });
+
+  // list clicks
+  document.addEventListener("click", e => {
+    const act = e.target.closest("[data-act]");
+    if(act){
+      const id = act.closest(".item").dataset.id; const p = preds[id]; const a = act.dataset.act;
+      if(a === "snooze"){ const [y,m,d] = p.due.split("-").map(Number); const nd = new Date(Math.max(new Date(y,m-1,d), new Date())); nd.setDate(nd.getDate()+3); savePred(Object.assign({},p,{due: ymd(nd)})); toast("Moved 3 days"); }
+      else { savePred(Object.assign({}, p, {outcome:a, resolvedAt:new Date().toISOString()})); toast(a==="yes"?"Nice — scored right":a==="no"?"Scored wrong — add a note on why?":"Marked void"); }
+      return;
+    }
+    const it = e.target.closest(".open-item");
+    if(it){ openSheet(it.closest(".item").dataset.id); }
+    const dc = e.target.closest("[data-del-cat]");
+    if(dc){ meta.cats = meta.cats.filter(c => c !== dc.dataset.delCat); if(!meta.cats.length) meta.cats = ["Other"]; saveMeta(); }
+  });
+
+  // nav
+  function show(v){
+    document.querySelectorAll(".view").forEach(s => s.classList.toggle("on", s.id === "v-"+v));
+    document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.v === v));
+    if(location.hash !== "#"+v) history.replaceState(null,"","#"+v);
+    window.scrollTo(0,0);
+  }
+  document.querySelectorAll("nav button").forEach(b => b.onclick = () => show(b.dataset.v));
+  const h = location.hash.slice(1); if(["today","history","stats","more"].includes(h)) show(h);
+
+  $("#hist-seg").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if(!b) return; histFilter = b.dataset.f; $("#hist-seg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); renderHistory(); });
+  $("#search").addEventListener("input", renderHistory);
+
+  $("#add-cat").onclick = () => { const v = $("#new-cat").value.trim(); if(!v || meta.cats.includes(v)) return; meta.cats.push(v); $("#new-cat").value=""; saveMeta(); };
+  $("#save-review").onclick = () => { const v = $("#review").value.trim(); if(!v) return; meta.reviews = (meta.reviews||[]).concat([{day: today(), text: v}]).slice(-52); $("#review").value=""; saveMeta(); toast("Review saved"); };
+
+  async function copy(text, msg){ try{ await navigator.clipboard.writeText(text); toast(msg); }catch(e){ $("#import").value = text; toast("Copy blocked — text placed in the box below"); } }
+  $("#copy-json").onclick = () => copy(JSON.stringify({preds: list(), meta}, null, 1), "Backup copied");
+  $("#copy-csv").onclick = () => {
+    const q = s => `"${String(s??"").replace(/"/g,'""')}"`;
+    const rows = [["created","prediction","confidence","category","due","outcome","reasoning","reflection"]].concat(list().map(p => [(p.created||"").slice(0,10),p.text,p.conf,p.cat,p.due,p.outcome||"open",p.note,p.reflection]));
+    copy(rows.map(r=>r.map(q).join(",")).join("\n"), "CSV copied");
+  };
+  $("#do-import").onclick = async () => {
+    try{
+      const o = JSON.parse($("#import").value);
+      const arr = Array.isArray(o.preds) ? o.preds : Object.values(o.preds||{});
+      if(o.meta){ meta = Object.assign(meta, o.meta); saveMeta(); }
+      for(const p of arr){ if(p && p.id && p.text) await savePred(p); }
+      $("#import").value = ""; toast(`Restored ${arr.length} predictions`);
+    }catch(e){ toast("That doesn't look like a valid backup"); }
+  };
+
+  // ---------- Themes ----------
+  const THEMES = [
+    ["pista","Pista","#cfe8b0"],
+    ["butter","Butter","#ffe8a3"],
+    ["sky","Sky","#bfe3ff"],
+    ["bubblegum","Bubblegum","#ffc9e0"],
+    ["lilac","Lilac","#d9ccff"],
+    ["night","Night","#1b2416"]
+  ];
+  function applyTheme(t){
+    t = THEMES.some(x => x[0] === t) ? t : "pista";
+    if(t === "pista") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", t);
+    try{ localStorage.setItem("pj-theme", t); }catch(e){}
+    document.querySelectorAll(".theme-btn").forEach(b => b.classList.toggle("on", b.dataset.t === t));
+  }
+  $("#themes").innerHTML = THEMES.map(([k,l,sw]) => `<button class="theme-btn" data-t="${k}"><i style="background:${sw}"></i>${l}</button>`).join("");
+  $("#themes").addEventListener("click", e => {
+    const b = e.target.closest("[data-t]"); if(!b) return;
+    meta.theme = b.dataset.t; applyTheme(meta.theme); saveMeta();
+  });
+  $("#theme-quick").onclick = () => { show("more"); };
+  try{ applyTheme(localStorage.getItem("pj-theme") || "pista"); }catch(e){ applyTheme("pista"); }
+
+  // ---------- Start ----------
+  lsLoad();
+  if(meta.theme) applyTheme(meta.theme);
+  resetForm();
+  render();
+  initNostr();
+  // refresh date-based state when returning to the tab
+  document.addEventListener("visibilitychange", () => { if(!document.hidden){ render(); if(ns.pk && Date.now() - (ns.lastSync||0) > 60000) syncNow(); } });
+})();
+</script>
+</body>
+</html>
