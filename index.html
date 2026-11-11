@@ -109,6 +109,8 @@ details[open] summary::before{content:"[–] "}
 .pts-num{font-family:"Archivo Black",Impact,sans-serif;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
 .pts-num.pos{color:var(--good)}.pts-num.neg{color:var(--bad)}
 .pts-lbl{font-family:"Space Mono",monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.conf.locked{opacity:.45}
+#conf-chips button:disabled{opacity:.45;cursor:default}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .stat{background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center}
 .stat b{display:block;font-family:"Space Mono",monospace;font-size:22px;font-weight:700}
@@ -194,6 +196,7 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
       <label>Confidence</label>
       <div class="conf"><div class="conf-num" id="conf-out">70%</div><input type="range" id="f-conf" min="50" max="99" value="70" class="grow"></div>
       <div class="chips" id="conf-chips" style="margin-top:10px"></div>
+      <p class="tip" id="conf-lock-note" hidden>🔒 Confidence is locked once a prediction is saved, so your scores stay honest. You can still edit the wording, date, category and notes.</p>
 
       <label for="f-due">I'll know by</label>
       <div class="row">
@@ -872,8 +875,13 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
   $("#due-chips").innerHTML = DUE_OPTS.map(([l,n]) => `<button class="chip" data-d="${n}">${l}</button>`).join("");
   $("#due-chips").addEventListener("click", e => { const b = e.target.closest("[data-d]"); if(!b) return; $("#f-due").value = addDays(+b.dataset.d); });
 
+  function setConfLock(on){
+    $("#f-conf").disabled = on; $("#conf-lock-note").hidden = !on;
+    $("#conf-chips").querySelectorAll("button").forEach(b => b.disabled = on);
+    document.querySelector(".conf").classList.toggle("locked", on);
+  }
   function resetForm(){
-    editingId = null;
+    editingId = null; setConfLock(false);
     $("#f-text").value = ""; $("#f-note").value = ""; $("#f-conf").value = 70; $("#f-due").value = addDays(7);
     $("#form-title").textContent = madeToday() ? "Another prediction" : "Today's prediction";
     $("#save-btn").textContent = "Save prediction";
@@ -881,7 +889,7 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
   }
   function startEdit(id){
     const p = preds[id]; if(!p) return;
-    editingId = id; show("today");
+    editingId = id; show("today"); setConfLock(true);
     $("#f-text").value = p.text; $("#f-note").value = p.note||""; $("#f-conf").value = p.conf; $("#f-due").value = p.due; $("#f-cat").value = p.cat;
     $("#form-title").textContent = "Edit prediction"; $("#save-btn").textContent = "Update prediction";
     syncConf(); window.scrollTo({top:0,behavior:"smooth"});
@@ -894,7 +902,7 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
     const due = $("#f-due").value || addDays(7);
     if(!editingId && due < today()){ toast("Pick a date in the future"); return; }
     const base = editingId ? preds[editingId] : { id: uid(), created: new Date().toISOString(), createdDay: today(), outcome: null };
-    savePred(Object.assign({}, base, { text, conf: +$("#f-conf").value, due, cat: $("#f-cat").value, note: $("#f-note").value.trim() }));
+    savePred(Object.assign({}, base, { text, conf: editingId ? base.conf : +$("#f-conf").value, due, cat: $("#f-cat").value, note: $("#f-note").value.trim() }));
     toast(editingId ? "Updated" : "Prediction saved");
     resetForm();
   });
