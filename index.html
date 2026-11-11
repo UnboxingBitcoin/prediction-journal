@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Prediction Journal</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -38,6 +38,8 @@ html[data-theme=night]{--bg:#1b2416;--bg-dot:#232f1c;--card:#10160d;--soft:#1f2a
   --accent:#cfe8b0;--on-accent:#111111;--good:#8ce99a;--bad:#ff8787;--warn:#ffa94d;--pop:#cfe8b0;--shadow:4px 4px 0 #cfe8b0;--shadow-sm:2px 2px 0 #cfe8b0}
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+input,textarea,select{font-size:16px}   /* 16px stops iOS zooming in when a field is focused */
 html,body{margin:0;color:var(--ink);font:15px/1.5 "Space Grotesk",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 body{background-color:var(--bg);background-image:radial-gradient(var(--bg-dot) 1.2px,transparent 1.2px);background-size:16px 16px}
 .wrap{max-width:560px;margin:0 auto;padding:24px 16px 120px}
@@ -60,7 +62,7 @@ button{font:inherit;cursor:pointer;background:none;color:var(--ink);border:0;pad
 .icon-btn{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--card);border:2px solid var(--line);box-shadow:var(--shadow-sm)}
 .icon-btn svg{width:19px;height:19px}
 
-input,textarea,select{font:inherit;color:var(--ink);background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:11px 13px;width:100%;outline:none}
+input,textarea,select{font:inherit;font-size:16px;color:var(--ink);background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:11px 13px;width:100%;outline:none}
 input:focus,textarea:focus,select:focus{box-shadow:var(--shadow-sm)}
 textarea{resize:vertical;min-height:64px}
 select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 12px) 50%;background-size:6px 6px;background-repeat:no-repeat}
@@ -960,6 +962,10 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
   resetForm();
   render();
   initNostr();
+  // iOS Safari ignores user-scalable=no, so block pinch and double-tap zoom directly.
+  ["gesturestart","gesturechange","gestureend"].forEach(t => document.addEventListener(t, e => e.preventDefault()));
+  let lastTouch = 0;
+  document.addEventListener("touchend", e => { const n = Date.now(); if(n - lastTouch < 300 && !e.target.closest("input,textarea,select")) e.preventDefault(); lastTouch = n; }, {passive:false});
   // refresh date-based state when returning to the tab
   document.addEventListener("visibilitychange", () => { if(!document.hidden){ render(); if(ns.pk && Date.now() - (ns.lastSync||0) > 60000) syncNow(); } });
 })();
