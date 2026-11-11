@@ -37,6 +37,18 @@ html[data-theme=bubblegum]{--bg:#ffc9e0;--bg-dot:#ffb3d3;--soft:#fff0f6;--muted:
 html[data-theme=lilac]{--bg:#d9ccff;--bg-dot:#c9b8ff;--soft:#f3efff;--muted:#4b3d80;--hair:#e1d9fb;--pop:#ffd43b}
 html[data-theme=night]{color-scheme:dark;--bg:#121a0f;--bg-dot:#1a2415;--card:#1d2819;--soft:#273420;--ink:#f4fbea;--muted:#b9cca2;--line:#cfe8b0;--hair:#38492e;
   --accent:#cfe8b0;--on-accent:#111111;--good:#8ce99a;--bad:#ff8f8f;--warn:#ffb457;--pop:#ffd43b;--on-pop:#111111;--shadow:4px 4px 0 #a8c489;--shadow-sm:2px 2px 0 #a8c489}
+
+/* Pure black & white themes. Status uses black vs grey plus signs and labels, never color. */
+html[data-theme=mono]{color-scheme:light;--bg:#ffffff;--bg-dot:#e9e9e9;--card:#ffffff;--soft:#f1f1f1;--ink:#000000;--muted:#555555;--line:#000000;--hair:#cfcfcf;
+  --accent:#000000;--on-accent:#ffffff;--good:#000000;--bad:#5c5c5c;--warn:#000000;--pop:#000000;--on-pop:#ffffff;--shadow:4px 4px 0 #000;--shadow-sm:2px 2px 0 #000}
+html[data-theme=noir]{color-scheme:dark;--bg:#000000;--bg-dot:#1d1d1d;--card:#000000;--soft:#141414;--ink:#ffffff;--muted:#b5b5b5;--line:#ffffff;--hair:#3c3c3c;
+  --accent:#ffffff;--on-accent:#000000;--good:#ffffff;--bad:#a8a8a8;--warn:#ffffff;--pop:#ffffff;--on-pop:#000000;--shadow:4px 4px 0 #ffffff;--shadow-sm:2px 2px 0 #ffffff}
+html[data-theme=mono] ::placeholder,html[data-theme=noir] ::placeholder{color:var(--muted);opacity:1}
+html[data-theme=mono] .brand img,html[data-theme=noir] .brand img,html[data-theme=mono] .streak,html[data-theme=noir] .streak{filter:grayscale(1)}
+html[data-theme=mono] .badge,html[data-theme=noir] .badge{background:var(--card);color:var(--ink);border-color:var(--line)}
+html[data-theme=mono] .notice.warn .dot{background:#fff}
+html[data-theme=noir] .notice.warn .dot{background:#000;border-color:#000}
+html[data-theme=mono] .toast,html[data-theme=noir] .toast{border-color:var(--line)}
 html[data-theme=night] body{font-weight:500}
 html[data-theme=night] ::placeholder{color:#a3b88c;opacity:1}
 html[data-theme=night] .tag.due{color:#ffc078}
@@ -165,7 +177,8 @@ ol li{margin:5px 0}
 .mono{font-family:"Space Mono",monospace;font-size:13px;font-weight:700;word-break:break-all}
 .wrapkey{background:var(--soft);border:2px dashed var(--line);border-radius:10px;padding:10px;margin-top:10px;user-select:all;-webkit-user-select:all}
 .keybox{border:2px solid var(--line);border-radius:14px;padding:12px;margin-top:14px;font-size:14px;background:var(--card)}
-.keybox.warn{background:var(--pop);color:#111}
+.keybox.warn{background:var(--pop);color:var(--on-pop)}
+.keybox.warn .wrapkey{color:var(--ink)}
 .relay{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:2px dashed var(--hair)}
 .relay:first-child{border-top:0}
 .relay .dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);flex:none}
@@ -968,7 +981,9 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
     ["sky","Sky","#bfe3ff"],
     ["bubblegum","Bubblegum","#ffc9e0"],
     ["lilac","Lilac","#d9ccff"],
-    ["night","Night","#121a0f"]
+    ["night","Night","#121a0f"],
+    ["mono","Mono","linear-gradient(135deg,#ffffff 50%,#000000 50%)"],
+    ["noir","Noir","#000000"]
   ];
   function applyTheme(t){
     t = THEMES.some(x => x[0] === t) ? t : "pista";
