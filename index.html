@@ -8,6 +8,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" id="tc" content="#cfe8b0">
+<script>try{var _t=localStorage.getItem("pj-theme");if(_t==="noir"||_t==="mono")document.getElementById("tc").setAttribute("content",_t==="noir"?"#000000":"#ffffff")}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Journal">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -58,6 +59,7 @@ html[data-theme=night] .chip.on,html[data-theme=night] .link.dark,html[data-them
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 input,textarea,select{font-size:16px}   /* 16px stops iOS zooming in when a field is focused */
+html{background-color:var(--bg)}
 html,body{margin:0;color:var(--ink);font:15px/1.5 "Space Grotesk",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 body{background-color:var(--bg);background-image:radial-gradient(var(--bg-dot) 1.2px,transparent 1.2px);background-size:16px 16px}
 .wrap{max-width:560px;margin:0 auto;padding:24px 16px 120px}
