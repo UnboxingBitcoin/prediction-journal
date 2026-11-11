@@ -912,7 +912,7 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
     try{
       const o = JSON.parse($("#import").value);
       const arr = Array.isArray(o.preds) ? o.preds : Object.values(o.preds||{});
-      if(o.meta){ meta = Object.assign(meta, o.meta); saveMeta(); }
+      if(o.meta){ meta = Object.assign(meta, o.meta); if(meta.theme) applyTheme(meta.theme); saveMeta(); }
       for(const p of arr){ if(p && p.id && p.text) await savePred(p); }
       $("#import").value = ""; toast(`Restored ${arr.length} predictions`);
     }catch(e){ toast("That doesn't look like a valid backup"); }
