@@ -105,6 +105,10 @@ details[open] summary::before{content:"[–] "}
 .acts .snooze{margin-left:auto}
 .empty{color:var(--muted);font-size:14px;padding:4px 0;font-family:"Space Mono",monospace}
 
+.points-box{display:flex;align-items:center;gap:16px;background:var(--soft);border:2.5px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:12px}
+.pts-num{font-family:"Archivo Black",Impact,sans-serif;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
+.pts-num.pos{color:var(--good)}.pts-num.neg{color:var(--bad)}
+.pts-lbl{font-family:"Space Mono",monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .stat{background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center}
 .stat b{display:block;font-family:"Space Mono",monospace;font-size:22px;font-weight:700}
@@ -234,12 +238,17 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
   <section class="view" id="v-stats">
     <div class="section">
       <h2>Scorecard</h2>
+      <div class="points-box">
+        <div class="pts-num" id="s-points">0</div>
+        <div><div class="pts-lbl">Total points</div><div class="sub" id="s-avgpts">Score a prediction to start</div></div>
+      </div>
       <div class="stats">
         <div class="stat"><b id="s-total">0</b><span>Made</span></div>
         <div class="stat"><b id="s-resolved">0</b><span>Scored</span></div>
         <div class="stat"><b id="s-hit">–</b><span>Correct</span></div>
         <div class="stat"><b id="s-brier">–</b><span>Brier</span></div>
       </div>
+      <p class="tip">Points: right earns up to +100, wrong costs more the surer you were. Right at 80% = +84, wrong at 80% = −156, and 50% is always 0. Formula: 100 − 400 × (miss)².</p>
       <p class="tip">Brier: 0 is perfect, 0.25 equals always guessing 50%. Lower is better.</p>
     </div>
     <div class="section">
@@ -664,6 +673,9 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
   }
   function madeToday(){ return list().some(p => (p.createdDay || (p.created||"").slice(0,10)) === today()); }
 
+  // Confidence-weighted points: 100 - 400 x (miss)^2. Right at 80% = +84, wrong at 80% = -156, 50% = 0.
+  const ptsFor = (conf, out) => 100 - 400 * Math.pow(conf/100 - (out === "yes" ? 1 : 0), 2);
+  const fmtPts = n => { n = Math.round(n); return n > 0 ? "+" + n : n < 0 ? "\u2212" + Math.abs(n) : "0"; };
   function brier(arr){ if(!arr.length) return null; return arr.reduce((s,p) => s + Math.pow(p.conf/100 - (p.outcome==="yes"?1:0), 2), 0) / arr.length; }
 
   const BUCKETS = [[50,59],[60,69],[70,79],[80,89],[90,99]];
@@ -679,8 +691,8 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
   // ---------- Render ----------
   function itemHTML(p, actions){
     let status = "";
-    if(p.outcome === "yes") status = `<span class="tag yes">Right</span>`;
-    else if(p.outcome === "no") status = `<span class="tag no">Wrong</span>`;
+    if(p.outcome === "yes") status = `<span class="tag yes">Right ${fmtPts(ptsFor(p.conf,"yes"))}</span>`;
+    else if(p.outcome === "no") status = `<span class="tag no">Wrong ${fmtPts(ptsFor(p.conf,"no"))}</span>`;
     else if(p.outcome === "void") status = `<span class="tag">Void</span>`;
     else if(isDue(p)) status = `<span class="tag due">Due</span>`;
     const dd = p.due ? daysUntil(p.due) : null;
@@ -747,6 +759,9 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
     $("#s-resolved").textContent = sc.length;
     $("#s-hit").textContent = sc.length ? Math.round(hits/sc.length*100)+"%" : "–";
     $("#s-brier").textContent = br==null ? "–" : br.toFixed(2);
+    const total = sc.reduce((s,p) => s + ptsFor(p.conf, p.outcome), 0);
+    const pe = $("#s-points"); pe.textContent = fmtPts(total); pe.className = "pts-num " + (Math.round(total) > 0 ? "pos" : Math.round(total) < 0 ? "neg" : "");
+    $("#s-avgpts").textContent = sc.length ? `${fmtPts(total / sc.length)} per prediction · ${sc.length} scored` : "Score a prediction to start";
 
     // calibration chart
     const bk = buckets(sc);
@@ -821,7 +836,7 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
     $("#sheet").querySelectorAll("[data-o]").forEach(b => b.onclick = () => {
       const o = b.dataset.o || null;
       savePred(Object.assign({}, p, {outcome:o, resolvedAt: o?new Date().toISOString():null, reflection:$("#sh-ref").value.trim()}));
-      closeSheet(); toast(o ? "Scored" : "Reopened");
+      closeSheet(); toast(o === "yes" || o === "no" ? (o === "yes" ? "Right " : "Wrong ") + fmtPts(ptsFor(p.conf, o)) + " points" : o ? "Marked void" : "Reopened");
     });
     $("#sh-edit").onclick = () => { closeSheet(); startEdit(id); };
     $("#sh-del").onclick = () => {
@@ -890,7 +905,7 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
     if(act){
       const id = act.closest(".item").dataset.id; const p = preds[id]; const a = act.dataset.act;
       if(a === "snooze"){ const [y,m,d] = p.due.split("-").map(Number); const nd = new Date(Math.max(new Date(y,m-1,d), new Date())); nd.setDate(nd.getDate()+3); savePred(Object.assign({},p,{due: ymd(nd)})); toast("Moved 3 days"); }
-      else { savePred(Object.assign({}, p, {outcome:a, resolvedAt:new Date().toISOString()})); toast(a==="yes"?"Nice — scored right":a==="no"?"Scored wrong — add a note on why?":"Marked void"); }
+      else { savePred(Object.assign({}, p, {outcome:a, resolvedAt:new Date().toISOString()})); toast(a==="yes" || a==="no" ? (a==="yes" ? "Right " : "Wrong ") + fmtPts(ptsFor(p.conf, a)) + " points" : "Marked void"); }
       return;
     }
     const it = e.target.closest(".open-item");
@@ -919,7 +934,7 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
   $("#copy-json").onclick = () => copy(JSON.stringify({preds: list(), meta}, null, 1), "Backup copied");
   $("#copy-csv").onclick = () => {
     const q = s => `"${String(s??"").replace(/"/g,'""')}"`;
-    const rows = [["created","prediction","confidence","category","due","outcome","reasoning","reflection"]].concat(list().map(p => [(p.created||"").slice(0,10),p.text,p.conf,p.cat,p.due,p.outcome||"open",p.note,p.reflection]));
+    const rows = [["created","prediction","confidence","category","due","outcome","points","reasoning","reflection"]].concat(list().map(p => [(p.created||"").slice(0,10),p.text,p.conf,p.cat,p.due,p.outcome||"open",(p.outcome==="yes"||p.outcome==="no")?Math.round(ptsFor(p.conf,p.outcome)):"",p.note,p.reflection]));
     copy(rows.map(r=>r.map(q).join(",")).join("\n"), "CSV copied");
   };
   $("#do-import").onclick = async () => {
