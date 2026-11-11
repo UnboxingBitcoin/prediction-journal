@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Prediction Journal</title>
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" id="fav" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#cfe8b0">
+<meta name="theme-color" id="tc" content="#cfe8b0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Journal">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,7 +44,7 @@ html[data-theme=mono]{color-scheme:light;--bg:#ffffff;--bg-dot:#e9e9e9;--card:#f
 html[data-theme=noir]{color-scheme:dark;--bg:#000000;--bg-dot:#1d1d1d;--card:#000000;--soft:#141414;--ink:#ffffff;--muted:#b5b5b5;--line:#ffffff;--hair:#3c3c3c;
   --accent:#ffffff;--on-accent:#000000;--good:#ffffff;--bad:#a8a8a8;--warn:#ffffff;--pop:#ffffff;--on-pop:#000000;--shadow:4px 4px 0 #ffffff;--shadow-sm:2px 2px 0 #ffffff}
 html[data-theme=mono] ::placeholder,html[data-theme=noir] ::placeholder{color:var(--muted);opacity:1}
-html[data-theme=mono] .brand img,html[data-theme=noir] .brand img,html[data-theme=mono] .streak,html[data-theme=noir] .streak{filter:grayscale(1)}
+html[data-theme=mono] .streak,html[data-theme=noir] .streak{filter:grayscale(1)}
 html[data-theme=mono] .badge,html[data-theme=noir] .badge{background:var(--card);color:var(--ink);border-color:var(--line)}
 html[data-theme=mono] .notice.warn .dot{background:#fff}
 html[data-theme=noir] .notice.warn .dot{background:#000;border-color:#000}
@@ -191,7 +191,7 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
 <div class="wrap">
   <header class="row between hdr">
     <div class="brand">
-      <img src="logo.svg" alt="" width="48" height="48">
+      <img id="brand-logo" src="logo.svg" alt="" width="48" height="48">
       <div>
         <h1>Prediction Journal</h1>
         <div class="sub" id="today-label"></div>
@@ -990,6 +990,10 @@ label.check input{width:20px;height:20px;accent-color:var(--accent);padding:0}
     if(t === "pista") document.documentElement.removeAttribute("data-theme");
     else document.documentElement.setAttribute("data-theme", t);
     try{ localStorage.setItem("pj-theme", t); }catch(e){}
+    const bw = t === "mono" || t === "noir", lg = bw ? "logo-" + t + ".svg" : "logo.svg";
+    const L = document.getElementById("brand-logo"); if(L) L.setAttribute("src", lg);
+    const F = document.getElementById("fav"); if(F) F.setAttribute("href", bw ? lg : "favicon.svg");
+    const T = document.getElementById("tc"); if(T) T.setAttribute("content", t === "noir" ? "#000000" : t === "mono" ? "#ffffff" : (getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() || "#cfe8b0"));
     document.querySelectorAll(".theme-btn").forEach(b => b.classList.toggle("on", b.dataset.t === t));
   }
   $("#themes").innerHTML = THEMES.map(([k,l,sw]) => `<button class="theme-btn" data-t="${k}"><i style="background:${sw}"></i>${l}</button>`).join("");
